@@ -149,4 +149,10 @@
     .activity-image img {
         max-height: 250px;
     }
+
+    .search-option {
+        font-size: 14px; /* Reduce font size */
+        padding: 6px; /* Adjust padding */
+        width: 90%; /* Reduce width for better fit */
+    }
 }
