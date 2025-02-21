@@ -1,0 +1,112 @@
+/* Side Navigation */
+.sidenav {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    background-color: #bbebf3;
+    padding-top: 20px;
+    transition: 0.3s;
+}
+
+/* Add box-shadow when sidenav is open */
+.sidenav.open {
+    left: 0;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3); /* Adjust values for desired effect */
+}
+
+.sidenav .hamburger-menu {
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+}
+
+.sidenav-content {
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px;
+}
+
+.sidenav-content a {
+    padding: 10px 15px;
+    text-decoration: none;
+    color: white;
+    font-size: 20px;
+    border-bottom: 1px solid #bbb;
+    transition: background-color 0.3s;
+}
+
+.sidenav-content a:hover {
+    background-color: #3b94e7;
+}
+
+
+
+
+/* Side Navigation */
+.sidenav {
+  height: 100%;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: -250px;
+  background-color: #bbebf3;
+  padding-top: 20px;
+  transition: 0.3s;
+}
+
+/* Add box-shadow when sidenav is open */
+.sidenav.open {
+  left: 0;
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure clicking inside sidenav-content doesn't close the sidenav */
+.sidenav-content {
+  display: flex;
+  flex-direction: column;
+  margin-top: 50px;
+}
+
+/* Default link styling */
+.sidenav-content a {
+  padding: 10px 15px;
+  text-decoration: none;
+  color: white;
+  font-size: 20px;
+  border-bottom: 1px solid #bbb;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Hover effect */
+.sidenav-content a:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Transparent effect */
+  text-decoration: underline; /* Underline on hover */
+}
+
+/* Active link styling */
+.sidenav-content a.active {
+  background-color: transparent; /* Keep background transparent */
+  text-decoration: underline; /* Underline for active link */
+  font-weight: bold;
+  color: #3b94e7; /* Highlight active link */
+}
+
+@media screen and (max-width: 768px) {
+  .sidenav {
+      width: 200px;
+  }
+}
+
+
+
+
+@media screen and (max-width: 768px) {
+    .sidenav {
+        width: 200px;
+    }
+}

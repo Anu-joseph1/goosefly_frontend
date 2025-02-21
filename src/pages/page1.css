@@ -1,0 +1,152 @@
+.page1-container {
+    width: 100%;
+    max-width: 1300px;
+    margin: auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Profile Section */
+.profile-container {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #fff;
+}
+
+.profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-right: 5px; /* Reduced margin further to bring name closer */
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    margin-left: 0px; /* Removed negative margin to align properly */
+}
+
+.name {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    position: relative;
+    left: 0px; /* Removed additional offset */
+}
+
+.designation {
+    font-size: 14px;
+    color: gray;
+    margin: 2px 0;
+}
+
+/* Post Time and Globe Icon */
+.post-details {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: gray;
+    margin-top: 1px;
+}
+
+.post-time {
+    margin-right: 5px;
+}
+
+.globe-icon {
+    color: gray;
+}
+
+/* Your Activity Section */
+.activity-container {
+    width: 100%;
+    max-width: 1300px;
+    margin: 10px auto;
+    background: #f8f9fa;
+    padding: 1px;
+    border-radius: 1px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.activity-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 1px;
+    text-align: left;
+}
+
+.activity-image img {
+    width: 99%;
+    height: auto;
+    max-height: 350px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.caption-box {
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+    padding: 5px;
+    border: none !important;
+    background: transparent !important;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    box-shadow: none !important;
+}
+
+.caption-box:focus {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Reaction Section */
+.reaction-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;
+    margin-top: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.reaction-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+    transition: color 0.3s ease;
+}
+
+.reaction-icon {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.reaction-item:hover {
+    color: #007bff;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .activity-container {
+        width: 95%;
+        max-width: 95%;
+        padding: 8px;
+    }
+
+    .activity-image img {
+        max-height: 250px;
+    }
+}
