@@ -1,14 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './SideNav.css';
 
-const SideNav = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const SideNav = ({ isOpen, toggleMenu }) => {
   const location = useLocation();
-
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
 
   return (
     <div className={`sidenav ${isOpen ? 'open' : ''}`}>

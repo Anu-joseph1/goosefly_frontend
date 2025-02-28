@@ -1,3 +1,6 @@
+/* page1.css */
+
+/* Main Container */
 .page1-container {
     width: 100%;
     max-width: 1300px;
@@ -6,6 +9,17 @@
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    padding: 20px;
+}
+
+/* Employee Post Container */
+.employee-post {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Profile Section */
@@ -22,36 +36,40 @@
     border-radius: 50%;
     border: 2px solid white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    margin-right: 5px; /* Reduced margin further to bring name closer */
+    margin-right: 10px;
 }
 
 .profile-info {
     display: flex;
     flex-direction: column;
-    margin-left: 0px; /* Removed negative margin to align properly */
+    justify-content: flex-start;
+    gap: 3px; /* Ensures proper spacing between name, designation, and post time */
 }
 
 .name {
     font-size: 18px;
     font-weight: bold;
     margin: 0;
-    position: relative;
-    left: 0px; /* Removed additional offset */
+    cursor: pointer;
+    color: #333;
+}
+
+.name:hover {
+    color: #007bff;
 }
 
 .designation {
     font-size: 14px;
     color: gray;
-    margin: 2px 0;
+    margin: 0;
 }
 
-/* Post Time and Globe Icon */
 .post-details {
     display: flex;
     align-items: center;
     font-size: 12px;
     color: gray;
-    margin-top: 1px;
+    margin: 0;
 }
 
 .post-time {
@@ -62,29 +80,18 @@
     color: gray;
 }
 
-/* Your Activity Section */
+/* Activity Section */
 .activity-container {
     width: 100%;
-    max-width: 1300px;
-    margin: 10px auto;
     background: #f8f9fa;
-    padding: 1px;
-    border-radius: 1px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
     text-align: center;
-}
-
-.activity-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 1px;
-    text-align: left;
 }
 
 .activity-image img {
     width: 99%;
     height: auto;
-    max-height: 350px;
+    max-height: 300px;
     object-fit: cover;
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -101,6 +108,7 @@
     resize: none;
     outline: none;
     box-shadow: none !important;
+    color: #333;
 }
 
 .caption-box:focus {
@@ -110,49 +118,52 @@
 }
 
 /* Reaction Section */
-.reaction-container {
+.reaction-stats {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 15px;
+    font-size: 13px;
+    color: #777;
+}
+
+.reaction-buttons {
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding: 10px 0;
-    margin-top: 10px;
     border-top: 1px solid #ddd;
 }
 
 .reaction-item {
     display: flex;
-    flex-direction: column;
     align-items: center;
     cursor: pointer;
     font-size: 14px;
     color: #555;
     transition: color 0.3s ease;
-}
-
-.reaction-icon {
-    font-size: 20px;
-    margin-bottom: 5px;
+    gap: 5px;
 }
 
 .reaction-item:hover {
     color: #007bff;
 }
 
+
 /* Responsive Design */
 @media screen and (max-width: 768px) {
-    .activity-container {
-        width: 95%;
-        max-width: 95%;
-        padding: 8px;
+    .page1-container {
+        padding: 10px;
     }
 
     .activity-image img {
-        max-height: 250px;
+        max-height: 200px;
     }
 
-    .search-option {
-        font-size: 14px; /* Reduce font size */
-        padding: 6px; /* Adjust padding */
-        width: 90%; /* Reduce width for better fit */
+    .profile-container {
+        flex-direction: row;
+    }
+
+    .profile-info {
+        align-items: flex-start;
     }
 }

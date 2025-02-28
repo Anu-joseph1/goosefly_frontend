@@ -1,0 +1,73 @@
+.container {
+    padding: 16px;
+    font-family: Arial, sans-serif;
+    text-align: left;
+  }
+  
+  .organization-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  
+  .profile-image {
+    width: 80px;
+    height: 70px;
+    border-radius: 50%;
+    margin-bottom: 12px;
+  }
+  
+  .company-name {
+    margin: 0;
+  }
+  
+  .bio, .location, .employee-info {
+    margin: 4px 0;
+    color: gray;
+  }
+  
+  .employee-info {
+    color: blue;
+    cursor: pointer;
+  }
+  
+  .section-title {
+    color: blue;
+  }
+  
+  .section {
+    background-color: #f1f6f7;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: left;
+  }
+  
+  .employee {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .employee-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 12px;
+  }
+  
+  .employee-name {
+    margin: 0;
+    font-weight: bold;
+  }
+  
+  .employee-role {
+    margin: 0;
+    color: gray;
+  }
+  
+  .more {
+    color: blue;
+    cursor: pointer;
+  }
+  
