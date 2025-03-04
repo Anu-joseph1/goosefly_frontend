@@ -11,10 +11,10 @@ const SideNav = ({ isOpen, toggleMenu }) => {
         &#9776; {/* Hamburger icon */}
       </div>
       <div className="sidenav-content" onClick={(e) => e.stopPropagation()}>
-        <Link to="/" className={location.pathname === '/' ? 'active' : ''}>Home</Link>
-        <Link to="/report" className={location.pathname === '/report' ? 'active' : ''}>Report</Link>
-        <Link to="/organization" className={location.pathname === '/organization' ? 'active' : ''}>Organization</Link>
-        <Link to="/profile" className={location.pathname === '/profile' ? 'active' : ''}>Profile</Link>
+        <Link to="/" className={location.pathname === '/' ? 'active' : ''} onClick={toggleMenu}>Home</Link>
+        <Link to="/report" className={location.pathname === '/report' ? 'active' : ''} onClick={toggleMenu}>Report</Link>
+        <Link to="/organization" className={location.pathname === '/organization' ? 'active' : ''} onClick={toggleMenu}>Organization</Link>
+        <Link to="/profile" className={location.pathname === '/profile' ? 'active' : ''} onClick={toggleMenu}>Profile</Link>
       </div>
     </div>
   );

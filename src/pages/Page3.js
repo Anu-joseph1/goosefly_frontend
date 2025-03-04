@@ -16,7 +16,9 @@ const OrganizationPage = () => {
           <h3 className="company-name">GOOSEFLY</h3>
           <p className="bio">Bio</p>
           <p className="location">MH, India</p>
-          <p className="employee-info">25 Employees · 5 Expert connections</p>
+          <p className="employee-info">
+            <strong>24 Employees</strong> · <strong>5 Expert connections</strong>
+          </p>
         </div>
 
         {/* Employees - Engineering */}
