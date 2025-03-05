@@ -2,9 +2,9 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./Topbar.css"; // Ensure correct import
 import gooseLogo from "../assets/goose.jpeg"; // Use relative path
-import { FaSearch, FaArrowLeft, FaCog } from "react-icons/fa"; // Import icons
+import { FaSearch, FaArrowLeft, FaCog, FaBars } from "react-icons/fa"; // Import icons
 
-const TopBar = () => {
+const TopBar = ({ toggleMenu }) => {
   const location = useLocation(); // Get current route
   const navigate = useNavigate(); // For back navigation
 
@@ -23,6 +23,7 @@ const TopBar = () => {
       ) : (
         // Default TopBar Design
         <>
+          <FaBars className="icon hamburger-menu" onClick={toggleMenu} /> {/* Hamburger menu */}
           <div className="logo-container">
             <img src={gooseLogo} alt="Goose Logo" className="logo-img" />
             <div className="logo-text">Goosefly</div>

@@ -4,12 +4,14 @@
   text-align: left;
 }
 
+/* Add margin-top to create space between the top bar and organization-info */
 .organization-info {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   margin-bottom: 16px;
   padding-left: 14px; /* Add left padding to create space */
+  margin-top: 20px; /* Add space between top bar and organization info */
 }
 
 .profile-image {
@@ -70,6 +72,12 @@
   color: gray;
 }
 
+.more-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .more {
   color: rgb(4, 101, 212);
   cursor: pointer;
@@ -77,6 +85,20 @@
   padding-left: 50px;
   padding-top: 5px;
   margin: 4px 0; /* Add some margin for spacing */
+}
+
+.add-more-btn {
+  background-color: rgb(12, 100, 214);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.add-more-btn:hover {
+  background-color: rgb(10, 90, 194);
 }
 
 /* Add More Experts Button */
@@ -94,5 +116,5 @@
 }
 
 .add-experts-btn:hover {
-  background-color: rgb(12, 100, 214);
+  background-color: rgb(10, 90, 194);
 }

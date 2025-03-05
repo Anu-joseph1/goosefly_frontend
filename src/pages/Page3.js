@@ -33,7 +33,10 @@ const OrganizationPage = () => {
               </div>
             </div>
           ))}
-          <p className="more">18 more...</p>
+          <div className="more-section">
+            <p className="more">18 more...</p>
+            <button className="add-more-btn">Add more</button>
+          </div>
         </div>
 
         {/* Engineering Experts */}
@@ -48,7 +51,10 @@ const OrganizationPage = () => {
               </div>
             </div>
           ))}
-          <p className="more">2 more...</p>
+          <div className="more-section">
+            <p className="more">2 more...</p>
+            <button className="add-more-btn">Add more</button>
+          </div>
         </div>
 
         {/* Add More Experts Button */}

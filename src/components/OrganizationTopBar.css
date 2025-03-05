@@ -1,19 +1,24 @@
 .organization-topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .organization-topbar .icon {
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  .organization-topbar .title {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 0;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Ensure it spans the full width */
+  position: fixed; /* Optional: Fix it to the top of the screen */
+  top: 0; /* Optional: Fix it to the top of the screen */
+  left: 0; /* Optional: Fix it to the top of the screen */
+  z-index: 1000; /* Optional: Ensure it stays above other content */
+}
+
+.organization-topbar .icon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.organization-topbar .title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}

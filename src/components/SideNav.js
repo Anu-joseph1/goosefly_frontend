@@ -7,9 +7,6 @@ const SideNav = ({ isOpen, toggleMenu }) => {
 
   return (
     <div className={`sidenav ${isOpen ? 'open' : ''}`}>
-      <div className="hamburger-menu" onClick={toggleMenu}>
-        &#9776; {/* Hamburger icon */}
-      </div>
       <div className="sidenav-content" onClick={(e) => e.stopPropagation()}>
         <Link to="/" className={location.pathname === '/' ? 'active' : ''} onClick={toggleMenu}>Home</Link>
         <Link to="/report" className={location.pathname === '/report' ? 'active' : ''} onClick={toggleMenu}>Report</Link>
