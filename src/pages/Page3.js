@@ -58,7 +58,7 @@ const OrganizationPage = () => {
         </div>
 
         {/* Add More Experts Button */}
-        <button className="add-experts-btn">Add More Experts</button>
+        {/* <button className="add-experts-btn">Add More Experts</button> */}
       </div>
     </div>
   );

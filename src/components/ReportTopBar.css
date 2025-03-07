@@ -27,9 +27,75 @@
   text-align: center;
 }
 
+/* Right Icons Container */
+.right-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between icons */
+}
+
+/* Plus Icon */
+.plus-icon {
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.plus-icon:hover {
+  transform: scale(1.1); /* Slightly enlarge on hover */
+}
+
 /* Right Cog Icon */
 .right-icon {
   font-size: 20px;
   cursor: pointer;
-  margin-left: auto; /* Pushes the icon to the right */
+}
+
+/* Popup Box */
+.popup-box {
+  position: absolute;
+  top: 50px; /* Position below the top bar */
+  right: 20px; /* Align with the right side */
+  background-color: rgb(217, 230, 233);
+  border: 1px solid #b1e2eb;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1001; /* Ensure it appears above other content */
+  padding: 10px 0;
+  width: 200px; /* Set a fixed width */
+}
+
+.popup-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.popup-item:hover {
+  background-color: #f5f5f5; /* Light gray background on hover */
+}
+
+.popup-icon {
+  margin-right: 10px;
+  font-size: 16px;
+  color: #555;
+}
+
+.popup-item span {
+  flex: 1; /* Ensure text takes up remaining space */
+}
+
+/* Mobile View Adjustments */
+@media (max-width: 768px) {
+  .popup-box {
+    right: 10px; /* Adjust right positioning for mobile */
+    width: calc(100% - 40px); /* Make the popup box responsive */
+    max-width: 300px; /* Limit maximum width */
+    left: 50%; /* Center the popup box */
+    transform: translateX(-50%); /* Center the popup box */
+  }
 }

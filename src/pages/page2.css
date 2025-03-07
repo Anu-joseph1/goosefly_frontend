@@ -1,173 +1,134 @@
-/* General Styles */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-}
-
+/* Existing CSS */
 .page2-container {
-  padding: 16px;
-  background-color: #fff;
-  max-width: 600px;
-  margin: 0 auto;
-  padding-top: 80px; /* Add space between top bar and report list */
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f8f8;
+  min-height: 100vh;
+  padding: 10px;
 }
 
-/* Header */
-.header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.header h1 {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
-}
-
-/* Reports List */
 .reports-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
+  margin-top: 55px; /* Add space between TopBar and reports */
 }
 
 .report-card {
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .report-header {
   display: flex;
   justify-content: space-between;
-  /* align-items: center; */
-  margin-bottom: 12px;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .user-info {
   display: flex;
-  align-items: left;
-  gap: 8px;
-  /* padding-left: 5px; */
+  align-items: center;
 }
 
-.user-name-profile {
-  
-  padding-left: 5px;
-
-}
 .user-image {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  object-fit: cover; /* Ensure the image is visible and fits properly */
+  margin-right: 10px;
+}
+
+.user-name-profile {
+  display: flex;
+  flex-direction: column;
 }
 
 .user-name {
   font-weight: bold;
   margin: 0;
-  font-size: 14px;
-  padding-left: 5px;
 }
 
 .user-role {
-  margin: 0;
-  font-size: 12px;
-  color: #666;
-}
-
-.report-time-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 14px;
+  color: gray;
+  margin: 2px 0;
 }
 
 .report-time {
   font-size: 12px;
-  color: #666;
+  color: gray;
+  margin-top: 2px;
+}
+
+.report-time-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .report-status {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 10px; /* Reduced font size */
+  font-size: 12px;
   font-weight: bold;
-  text-align: center;
-  display: inline-block; /* Make the button inline */
+  color: white;
+  background: green;
+  padding: 5px 10px;
+  border-radius: 12px;
 }
 
-.report-status.solved {
-  background-color: #3be662;
-  color: #040504;
-}
-
+/* Updated report-details section */
 .report-details {
-  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 0; /* Remove gap to tightly pack elements */
 }
 
 .report-title {
   font-weight: bold;
-  margin: 0 0 8px;
-  padding-left: 0%;
+  margin: 0; /* Remove margin */
 }
 
 .report-issue {
-  color: #666;
-  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+  margin: 0 0 10px 0; /* Add margin-bottom to create space */
 }
 
 .report-description {
-  margin: 0 0 8px;
-  color: #333;
+  font-size: 14px;
+  color: gray;
+  margin: 0; /* Remove margin */
 }
 
 .see-more {
-  color: #007bff;
-  cursor: pointer;
-  margin: 0;
-  font-size: 12px;
-}
-
-/* Footer Note */
-.footer-note {
-  margin-top: 20px;
-  padding: 16px;
-  background-color: #ebe71a;
-  border-radius: 8px;
-  font-size: 12px;
-  color: #666666;
-  text-align: center;
-}
-
-/* Bottom Navigation */
-.bottom-nav {
-  display: flex;
-  justify-content: space-around;
-  background-color: #fff;
-  padding: 10px 0;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.nav-item {
   font-size: 14px;
-  color: #666;
+  color: blue;
   cursor: pointer;
+  margin: 0; /* Remove margin */
 }
 
-.nav-item.active {
-  color: #007bff;
-  font-weight: bold;
+/* Footer Note Styling */
+.footer-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: yellow;
+  padding: 10px 15px;
+  border-radius: 10px;
+  margin-top: 20px;
 }
 
-.user-image {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover; /* Ensure the image fits properly */
+.footer-text {
+  font-size: 14px;
+  color: black;
+  flex: 1;
+}
+
+.robot-icon {
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
 }
