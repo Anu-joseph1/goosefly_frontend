@@ -169,3 +169,32 @@
         align-items: flex-start;
     }
 }
+
+/* Post Header */
+.post-header {
+    display: flex;
+    justify-content: space-between; /* Space between text and ellipsis */
+    align-items: center; /* Vertically center items */
+    background: hwb(210 97% 2%); /* Light gray background */
+    padding: 10px 10px; /* Padding for spacing */
+    font-size: 14px; /* Font size */
+    font-weight: bold; /* Bold text */
+    color: #333; /* Dark text color */
+    border-bottom: 1px solid #ddd; /* Bottom border for separation */
+    border-top-left-radius: 10px; /* Rounded corners to match the container */
+    border-top-right-radius: 10px; /* Rounded corners to match the container */
+    width: 105%; /* Full width */
+    box-sizing: border-box; /* Include padding in width */
+}
+
+/* Ellipsis Icon */
+.ellipsis-icon {
+    cursor: pointer; /* Pointer cursor on hover */
+    color: #555; /* Icon color */
+    font-size: 16px; /* Icon size */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+
+.ellipsis-icon:hover {
+    color: #007bff; /* Change color on hover */
+}

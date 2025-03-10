@@ -41,7 +41,7 @@ function AppContent({ isOpen, toggleMenu }) {
           <Route path="/" element={<Page1 isOpen={isOpen} />} />
           <Route path="/report" element={<Page2 />} />
           <Route path="/organization" element={<Page3 />} />
-          <Route path="/profile" element={<Page4 />} />
+          <Route path="/profile/:employeeId" element={<Page4 />} /> {/* Add route for profile page with employeeId */}
         </Routes>
       </div>
     </div>

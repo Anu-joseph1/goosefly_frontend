@@ -7,14 +7,14 @@ import { employees } from "../data/employees"; // Assuming you move the employee
 const Page1 = ({ isOpen }) => {
   const navigate = useNavigate();
 
-  const goToProfile = () => {
-    navigate("/profile");
+  const goToProfile = (employeeId) => {
+    navigate(`/profile/${employeeId}`); // Navigate to the profile page with employeeId
   };
 
   return (
     <div className="page1-container">
       {employees.map((employee) => (
-        <EmployeePost key={employee.id} employee={employee} goToProfile={goToProfile} />
+        <EmployeePost key={employee.id} employee={employee} goToProfile={() => goToProfile(employee.id)} />
       ))}
     </div>
   );

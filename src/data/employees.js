@@ -9,6 +9,7 @@ export const employees = [
       caption: "Robotics is the interdisciplinary study and practice of the design, construction, operation, and use of robots.",
       upvotes: 7,
       Comments: 11,
+      plant: 1,
     },
     {
       id: 2,
@@ -20,6 +21,7 @@ export const employees = [
       caption: "AI is transforming the way businesses analyze data and make decisions.",
       upvotes: 12,
       comments: 18,
+      plant: 2,
     },
     {
       id: 3,
@@ -30,6 +32,7 @@ export const employees = [
       postImage: require("../assets/post3.jpg"),
       caption: "User experience plays a vital role in product development.",
       upvotes: 9,
-      comments: 15,
+      shares: 15,
+      plant: 3,
     },
   ];

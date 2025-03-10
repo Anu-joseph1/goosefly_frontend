@@ -1,0 +1,162 @@
+/* Page4.css */
+
+/* Main Container */
+.page4-container {
+    width: 100%;
+    max-width: 1300px;
+    margin: auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 20px;
+    box-sizing: border-box; /* Ensure padding is included in the width */
+  }
+  
+  /* Profile Section */
+  .profile-section {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .back-arrow {
+    font-size: 20px;
+    cursor: pointer;
+    margin-right: 15px;
+    color: #333;
+  }
+  
+  .back-arrow:hover {
+    color: #007bff;
+  }
+  
+  .profile-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+  }
+  
+  .profile-details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .profile-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+  }
+  
+  .profile-designation {
+    font-size: 14px;
+    color: #555;
+    margin: 0;
+  }
+  
+  .profile-username {
+    font-size: 14px;
+    color: #777;
+    margin: 0;
+  }
+  
+  .profile-bio {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .profile-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .edit-profile-btn {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .edit-profile-btn:hover {
+    background: #0056b3;
+  }
+  
+  .stats {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .followers,
+  .experts {
+    font-size: 14px;
+    color: #555;
+  }
+  
+  /* Employee Post Container */
+  .employee-post {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding-right: 18px;
+  }
+  
+  /* Responsive Design */
+  @media screen and (max-width: 768px) {
+    .page4-container {
+      padding: 10px;
+      margin: 10px; /* Add margin to ensure the container doesn't touch the screen edges */
+      width: calc(100% - 20px); /* Adjust width to account for margin */
+      box-sizing: border-box; /* Ensure padding and margin are included in the width */
+    }
+  
+    .profile-pic {
+      width: 50px;
+      height: 50px;
+    }
+  
+    .profile-name {
+      font-size: 16px;
+    }
+  
+    .profile-designation,
+    .profile-username {
+      font-size: 12px;
+    }
+  
+    .profile-bio {
+      font-size: 12px;
+    }
+  
+    .edit-profile-btn {
+      font-size: 12px;
+      padding: 6px 12px;
+    }
+  
+    .followers,
+    .experts {
+      font-size: 12px;
+    }
+  }
