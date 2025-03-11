@@ -42,8 +42,8 @@
 .profile-info {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    gap: 3px; /* Ensures proper spacing between name, designation, and post time */
+    justify-content: center; /* Center the content vertically */
+    gap: 2px; /* Adjust the gap between name, designation, and post time */
 }
 
 .name {

@@ -27,21 +27,26 @@ function AppContent({ isOpen, toggleMenu }) {
   const location = useLocation();
 
   // Conditionally render TopBar based on the route
-  const shouldShowTopBar = location.pathname !== "/report" && location.pathname !== "/organization";
+  const shouldShowTopBar = 
+    location.pathname !== "/report" && 
+    location.pathname !== "/organization" && 
+    !location.pathname.startsWith("/profile/");
 
   // Conditionally render SideNav based on the route
-  const shouldShowSideNav = location.pathname !== "/report" && location.pathname !== "/organization";
+  const shouldShowSideNav = 
+    location.pathname !== "/report" && 
+    location.pathname !== "/organization";
 
   return (
     <div className="App">
-      {shouldShowTopBar && <TopBar toggleMenu={toggleMenu} />} {/* Show TopBar only if not on the report or organization page */}
+      {shouldShowTopBar && <TopBar toggleMenu={toggleMenu} />} {/* Show TopBar only if not on report, organization, or profile page */}
       {shouldShowSideNav && <SideNav isOpen={isOpen} toggleMenu={toggleMenu} />} {/* Show SideNav only if not on the report or organization page */}
       <div className="content">
         <Routes>
           <Route path="/" element={<Page1 isOpen={isOpen} />} />
           <Route path="/report" element={<Page2 />} />
           <Route path="/organization" element={<Page3 />} />
-          <Route path="/profile/:employeeId" element={<Page4 />} /> {/* Add route for profile page with employeeId */}
+          <Route path="/profile/:employeeId" element={<Page4 />} /> {/* Profile page */}
         </Routes>
       </div>
     </div>
