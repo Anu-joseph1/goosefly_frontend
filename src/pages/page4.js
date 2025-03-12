@@ -66,18 +66,18 @@ const Page4 = () => {
             <div className="profile-details">
               <h2 className="profile-name">{employeeDetails.name}</h2>
               <p className="profile-designation">{employeeDetails.designation}</p>
-              <p className="profile-username">@{employeeDetails.username}</p>
+              <p className="profile-industry">@{employeeDetails.username}</p>
+              <p className="profile-bio">{employeeDetails.bio}</p>
+              <div className="profile-stats">
+                <button className="edit-profile-btn" onClick={() => setIsModalOpen(true)}>
+                  Edit Profile
+                </button>
+                <div className="stats">
+                  <span className="followers">{employeeDetails.followers} Followers</span>
+                  <span className="experts">{employeeDetails.experts} Experts</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <p className="profile-bio">{employeeDetails.bio}</p>
-        <div className="profile-stats">
-          <button className="edit-profile-btn" onClick={() => setIsModalOpen(true)}>
-            Edit Profile
-          </button>
-          <div className="stats">
-            <span className="followers">{employeeDetails.followers} Followers</span>
-            <span className="experts">{employeeDetails.experts} Experts</span>
           </div>
         </div>
       </div>

@@ -1,21 +1,19 @@
-/* Page4.css */
-
 /* Main Container */
 .page4-container {
+  padding: 10px;
+  max-width: 1600px;
+  margin: 0 auto;
   width: 100%;
-  max-width: 100%;
-  margin: 0;
   background: #fff;
   border-radius: 0;
   box-shadow: none;
   overflow: hidden;
-  padding: 20px;
   box-sizing: border-box;
 }
 
 /* Profile Section */
 .profile-section {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   padding: 20px;
   background: #fff;
   border-radius: 10px;
@@ -24,96 +22,78 @@
 
 .profile-header {
   display: flex;
-  align-items: center;
-  margin-bottom: 15px;
+  align-items: flex-start;
+  gap: 20px;
 }
 
 .back-arrow {
-  font-size: 20px;
+  font-size: 24px;
   cursor: pointer;
-  margin-right: 15px;
-  color: #333;
-}
-
-.back-arrow:hover {
-  color: #007bff;
 }
 
 .profile-info {
   display: flex;
-  align-items: center;
+  gap: 20px;
+  width: 100%;
 }
 
 .profile-pic {
-  width: 60px;
-  height: 60px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  margin-right: 15px;
+  object-fit: cover;
 }
 
 .profile-details {
-  display: flex;
-  flex-direction: column;
+  flex-grow: 1;
 }
 
 .profile-name {
-  font-size: 18px;
-  font-weight: bold;
-  margin: 0;
-  color: #333;
+  margin: 0 0 5px 0;
+  font-size: 24px;
 }
 
 .profile-designation {
-  font-size: 14px;
-  color: #555;
-  margin: 0;
+  margin: 0 0 5px 0;
+  color: #666;
 }
 
-.profile-username {
-  font-size: 14px;
-  color: #777;
-  margin: 0;
+.profile-industry {
+  margin: 0 0 10px 0;
+  color: #666;
 }
 
 .profile-bio {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 15px;
+  margin: 15px 0;
 }
 
 .profile-stats {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 20px;
 }
 
 .edit-profile-btn {
-  background: #007bff;
-  color: #fff;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
   border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
-}
-
-.edit-profile-btn:hover {
-  background: #0056b3;
 }
 
 .stats {
   display: flex;
-  gap: 15px;
+  gap: 20px;
 }
 
-.followers,
-.experts {
-  font-size: 14px;
-  color: #555;
+.followers, .experts {
+  color: #666;
 }
 
 /* Employee Post Container */
 .employee-post {
+  margin-top: 10px;
   margin-bottom: 20px;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -226,7 +206,7 @@
   }
 
   .profile-designation,
-  .profile-username {
+  .profile-industry {
     font-size: 12px;
   }
 
