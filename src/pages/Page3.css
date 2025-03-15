@@ -4,30 +4,40 @@
   text-align: left;
 }
 
-/* Add margin-top to create space between the top bar and organization-info */
+/* Organization Info */
 .organization-info {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 16px;
+  align-items: flex-start; /* Align items to the top */
+  gap: 20px; /* Space between profile image and company details */
+  margin-bottom: 8px; /* Reduced space between organization-info and section-container */
   padding-left: 14px; /* Add left padding to create space */
-  margin-top: 20px; /* Add space between top bar and organization info */
+  margin-top: 40px; /* Space between top bar and organization info */
 }
 
 .profile-image {
-  width: 80px;
-  height: 70px;
-  border-radius: 50%;
-  margin-bottom: 12px;
+  width: 80px; /* Reduced size */
+  height: 80px; /* Reduced size */
+  border-radius: 50%; /* Round shape */
+  border: 1px solid #ddd; /* Smaller round border */
+  object-fit: cover; /* Ensure the image fits well */
+}
+
+.company-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Space between company name, bio, location, and employee info */
 }
 
 .company-name {
   margin: 0;
+  font-size: 15px; /* Font size for company name */
+  font-weight: bold;
 }
 
 .bio, .location, .employee-info {
-  margin: 4px 0;
+  margin: 0;
   color: gray;
+  font-size: 13px;
 }
 
 .employee-info {
@@ -35,14 +45,36 @@
   cursor: pointer;
 }
 
+/* Section Container */
+.section-container {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Section Title with Full-Width Line */
 .section-title {
   color: rgb(10, 10, 14);
-  margin-top: 20px;
-  margin-bottom: 0; /* Remove space below the section title */
+  margin: 0 0 12px 0;
+  padding-bottom: 12px;
+  position: relative; /* Required for pseudo-element */
+}
+
+.section-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%; /* Full width of the container */
+  height: 2px; /* Line thickness */
+  background-color: #ddd; /* Line color */
 }
 
 .section {
-  background-color: #f1f6f7;
+  background-color: #fcfcfc;
   padding: 12px;
   border-radius: 8px;
   text-align: left;
@@ -65,11 +97,13 @@
 .employee-name {
   margin: 0;
   font-weight: bold;
+  font-size: 15px;
 }
 
 .employee-role {
   margin: 0;
   color: gray;
+  font-size: 12px;
 }
 
 .more-section {
@@ -93,7 +127,7 @@
   border: none;
   border-radius: 6px;
   padding: 8px 16px;
-  font-size: 14px;
+  font-size: 12px;
   cursor: pointer;
 }
 

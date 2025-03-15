@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import EmployeePost from "../components/EmployeePost";
 import { employees } from "../data/employees";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaPlus, FaBell } from "react-icons/fa";
 import "./page4.css";
 
 const Page4 = () => {
@@ -11,6 +11,7 @@ const Page4 = () => {
   const [employeePosts, setEmployeePosts] = useState([]);
   const [employeeDetails, setEmployeeDetails] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false); // State for the popup menu
   const [formData, setFormData] = useState({
     name: "",
     designation: "",
@@ -51,6 +52,10 @@ const Page4 = () => {
     setIsModalOpen(false);
   };
 
+  const togglePopup = () => {
+    setIsPopupOpen(!isPopupOpen); // Toggle the popup menu
+  };
+
   if (!employeeDetails) {
     return <div>Employee not found.</div>;
   }
@@ -77,6 +82,20 @@ const Page4 = () => {
                   <span className="experts">{employeeDetails.experts} Experts</span>
                 </div>
               </div>
+            </div>
+          </div>
+          {/* Popup + Icon and Notification Icon */}
+          <div className="profile-actions">
+            <FaBell className="notification-icon" />
+            <div className="popup-container">
+              <FaPlus className="popup-icon" onClick={togglePopup} />
+              {isPopupOpen && (
+                <div className="popup-menu">
+                  <div className="popup-item">New Post</div>
+                  <div className="popup-item">Create a New Issue</div>
+                  <div className="popup-item">Add a Suggestion</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
