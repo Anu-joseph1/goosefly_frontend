@@ -10,6 +10,7 @@ export const employees = [
       upvotes: 7,
       Comments: 11,
       plant: 1,
+      
     },
     {
       id: 2,
@@ -22,6 +23,7 @@ export const employees = [
       upvotes: 12,
       comments: 18,
       plant: 2,
+     
     },
     {
       id: 3,
@@ -34,5 +36,6 @@ export const employees = [
       upvotes: 9,
       shares: 15,
       plant: 3,
+    
     },
   ];

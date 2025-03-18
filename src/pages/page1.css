@@ -64,7 +64,7 @@
     font-size: 12px;
     color: gray;
     margin: 0; /* Remove margin */
-    cursor: pointer;
+    cursor: pointer; 
     line-height: 1.2; /* Adjust line height to reduce space */
 }
 
@@ -95,7 +95,7 @@
 }
 
 .activity-image img {
-    width: 99%;
+    width: 94%;
     height: auto;
     max-height: 300px;
     object-fit: cover;

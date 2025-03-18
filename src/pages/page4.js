@@ -11,7 +11,7 @@ const Page4 = () => {
   const [employeePosts, setEmployeePosts] = useState([]);
   const [employeeDetails, setEmployeeDetails] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // State for the popup menu
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     designation: "",
@@ -44,7 +44,6 @@ const Page4 = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Update employee details here (e.g., API call or state update)
     setEmployeeDetails({
       ...employeeDetails,
       ...formData,
@@ -53,7 +52,7 @@ const Page4 = () => {
   };
 
   const togglePopup = () => {
-    setIsPopupOpen(!isPopupOpen); // Toggle the popup menu
+    setIsPopupOpen(!isPopupOpen);
   };
 
   if (!employeeDetails) {
@@ -61,39 +60,39 @@ const Page4 = () => {
   }
 
   return (
-    <div className="page4-container">
+    <div className="container">
       {/* Profile Section */}
-      <div className="profile-section">
-        <div className="profile-header">
-          <FaArrowLeft className="back-arrow" onClick={() => navigate(-1)} />
-          <div className="profile-info">
-            <img src={employeeDetails.profilePic} alt="Profile" className="profile-pic" />
-            <div className="profile-details">
-              <h2 className="profile-name">{employeeDetails.name}</h2>
-              <p className="profile-designation">{employeeDetails.designation}</p>
-              <p className="profile-industry">@{employeeDetails.username}</p>
-              <p className="profile-bio">{employeeDetails.bio}</p>
-              <div className="profile-stats">
-                <button className="edit-profile-btn" onClick={() => setIsModalOpen(true)}>
+      <div className="profile">
+        <div className="header">
+          <FaArrowLeft className="back" onClick={() => navigate(-1)} />
+          <div className="profile-content">
+            <img src={employeeDetails.profilePic} alt="Profile" className="image" />
+            <div className="details">
+              <h2 className="name">{employeeDetails.name}</h2>
+              <p className="text">{employeeDetails.designation}</p>
+              <p className="text">@{employeeDetails.username}</p>
+              <p className="text">{employeeDetails.bio}</p>
+              <div className="stats">
+                <button className="btn" onClick={() => setIsModalOpen(true)}>
                   Edit Profile
                 </button>
-                <div className="stats">
-                  <span className="followers">{employeeDetails.followers} Followers</span>
-                  <span className="experts">{employeeDetails.experts} Experts</span>
+                <div className="numbers">
+                  <span className="text">{employeeDetails.followers} Followers</span>
+                  <span className="text">{employeeDetails.experts} Experts</span>
                 </div>
               </div>
             </div>
           </div>
-          {/* Popup + Icon and Notification Icon */}
-          <div className="profile-actions">
-            <FaBell className="notification-icon" />
-            <div className="popup-container">
-              <FaPlus className="popup-icon" onClick={togglePopup} />
+          {/* Actions */}
+          <div className="actions">
+            <FaBell className="icon notification" />
+            <div className="popup">
+              <FaPlus className="icon popup" onClick={togglePopup} />
               {isPopupOpen && (
-                <div className="popup-menu">
-                  <div className="popup-item">New Post</div>
-                  <div className="popup-item">Create a New Issue</div>
-                  <div className="popup-item">Add a Suggestion</div>
+                <div className="menu">
+                  <div className="item">New Post</div>
+                  <div className="item">Create a New Issue</div>
+                  <div className="item">Add a Suggestion</div>
                 </div>
               )}
             </div>
@@ -108,7 +107,7 @@ const Page4 = () => {
 
       {/* Edit Profile Modal */}
       {isModalOpen && (
-        <div className="modal-overlay">
+        <div className="overlay">
           <div className="modal">
             <h2>Edit Profile</h2>
             <form onSubmit={handleSubmit}>
@@ -147,7 +146,7 @@ const Page4 = () => {
                   onChange={handleInputChange}
                 />
               </label>
-              <div className="modal-buttons">
+              <div className="buttons">
                 <button type="submit">Save</button>
                 <button type="button" onClick={() => setIsModalOpen(false)}>
                   Cancel
