@@ -1,0 +1,124 @@
+.comment-section-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #ddd;
+    padding: 15px;
+    max-height: 70vh;
+    overflow-y: auto;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+  }
+  
+  .comment-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    position: relative;
+  }
+  
+  .comment-heading-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  
+  .comment-heading {
+    margin: 0;
+  }
+  
+  .comment-subheading {
+    color: #65676b;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #65676b;
+  }
+  
+  .comments-list {
+    margin-bottom: 15px;
+    margin-top: 40px; /* Added space for centered heading */
+  }
+  
+  .comment-item {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .comment-user {
+    font-weight: bold;
+  }
+  
+  .comment-time {
+    color: #65676b;
+    font-size: 12px;
+  }
+  
+  .comment-text {
+    margin-bottom: 8px;
+  }
+  
+  .comment-actions {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .reply-button, .delete-button {
+    background: none;
+    border: none;
+    color: #65676b;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  .delete-button {
+    color: #ff4444;
+  }
+  
+  .add-comment-form {
+    display: flex;
+    margin-top: 15px;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .add-comment-form input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+  }
+  
+  .post-button {
+    background-color: #1877f2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .post-button:hover {
+    background-color: #166fe5;
+  }
