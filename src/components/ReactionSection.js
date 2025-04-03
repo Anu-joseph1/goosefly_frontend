@@ -19,7 +19,7 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
           setError(null);
           
           // Add post_id to the URL
-          const response = await fetch(`http://172.16.10.144:8000/read-comments?post_id=${postId}`);
+          const response = await fetch(`http://172.16.10.144:8000/read-comments `);
           
           if (!response.ok) {
             throw new Error(`Failed to fetch comments: ${response.status}`);
