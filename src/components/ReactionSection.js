@@ -18,6 +18,7 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
           setLoading(true);
           setError(null);
           
+          // Add post_id to the URL
           const response = await fetch(`http://172.16.10.144:8000/read-comments?post_id=${postId}`);
           
           if (!response.ok) {
@@ -51,47 +52,50 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
     try {
       setError(null);
       
+      // Validate comment before sending
+      if (!commentText || commentText.trim().length === 0) {
+        throw new Error("Comment cannot be empty");
+      }
+      if (commentText.length > 500) {
+        throw new Error("Comment must be 500 characters or less");
+      }
+  
       const response = await fetch('http://172.16.10.144:8000/write-comments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          post_id: postId,
-          user_id: "current_user_id", // Replace with actual user ID from your auth system
-          text: commentText
+          post_id: postId,  // Ensure this is the correct type (number/string)
+          user_id: "current_user_id", // TODO: Replace with real user ID
+          comment_text: commentText.trim(), // Try both 'comment_text' and 'text'
+          // organization_id: null // Only include if required
         })
       });
-
-      if (!response.ok) {
-        throw new Error(`Failed to add comment: ${response.status}`);
-      }
-
-      const newComment = await response.json();
+  
+      const responseData = await response.json();
       
-      // Update the comment list with the new comment
-      setCommentList(prevComments => [newComment, ...prevComments]);
+      if (!response.ok) {
+        console.error('Backend validation error:', responseData);
+        throw new Error(responseData.detail || responseData.message || "Invalid comment format");
+      }
+  
+      // Successful comment - add to list
+      setCommentList(prev => [responseData, ...prev]);
       
     } catch (err) {
-      setError(err.message);
+      console.error('Comment submission failed:', err);
+      setError(
+        err.message.includes("422") 
+          ? "Please write a comment (1-500 characters, no special formatting)"
+          : err.message
+      );
     }
-  };
-
-  const handleDeleteComment = async (commentId) => {
-    // Since you haven't provided a delete endpoint, we'll implement a frontend-only delete
-    // Note: This will only remove the comment from the UI, not from the backend
-    // In a production app, you should implement a proper DELETE endpoint
-    setCommentList(prevComments => 
-      prevComments.filter(comment => comment.comment_id !== commentId)
-    );
-    
-    // Show warning that this is frontend-only
-    setError("Note: Comment deletion is currently frontend-only. Refresh will bring it back.");
   };
 
   return (
     <div className="reaction-container">
-      {/* Error display */}
+      {/* Error display (if any) */}
       {error && (
         <div className="error-message">
           {error}
@@ -136,11 +140,11 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
         </div>
       </div>
 
+      {/* Comment Section */}
       {showComments && (
         <CommentSection
           comments={commentList}
           onAddComment={handleAddComment}
-          onDeleteComment={handleDeleteComment}
           onClose={() => setShowComments(false)}
           loading={loading}
         />

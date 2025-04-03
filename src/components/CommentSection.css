@@ -122,3 +122,31 @@
   .post-button:hover {
     background-color: #166fe5;
   }
+
+
+  /* CommentSection.css */
+.loading-comments {
+  padding: 15px;
+  text-align: center;
+  color: #666;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-message button {
+  background: none;
+  border: none;
+  color: #c62828;
+  font-size: 18px;
+  cursor: pointer;
+}
+
