@@ -10,34 +10,48 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch comments when comment section is opened
   useEffect(() => {
     const fetchComments = async () => {
-      if (showComments && postId) {
-        try {
-          setLoading(true);
-          setError(null);
-          
-          // Add post_id to the URL
-          const response = await fetch(`http://172.16.10.144:8000/read-comments `);
-          
-          if (!response.ok) {
-            throw new Error(`Failed to fetch comments: ${response.status}`);
-          }
-          
-          const data = await response.json();
-          setCommentList(data);
-        } catch (err) {
-          setError(err.message);
-          setCommentList([]);
-        } finally {
-          setLoading(false);
+      try {
+        setLoading(true);
+        setError(null);
+        console.log("Fetching comments...");
+
+        const response = await fetch('http://172.16.10.144:8000/all-comments');
+        console.log("Response status:", response.status);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch comments: ${response.status}');
         }
+
+        const data = await response.json();
+        console.log("Fetched comments:", data);
+        
+        // Transform the data to match the expected format
+        const transformedComments = data.map(comment => ({
+          comment_id: comment.comment_id,
+          user: comment.user_name,
+          text: comment.text,
+          time: new Date(comment.created_at).toLocaleString(),
+          profile_pic: comment.profile_pic,
+          replies: comment.replies,
+          post_id: comment.post_id
+        }));
+        
+        console.log("Transformed comments:", transformedComments);
+        setCommentList(transformedComments);
+      } catch (err) {
+        console.error("Error fetching comments:", err);
+        setError(err.message);
+        setCommentList([]);
+      } finally {
+        setLoading(false);
       }
     };
 
+    // Fetch comments immediately when component mounts
     fetchComments();
-  }, [showComments, postId]);
+  }, []); // Remove showComments dependency to fetch on mount
 
   const handleUpvote = () => {
     if (isUpvoted) {
@@ -52,57 +66,38 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
     try {
       setError(null);
       
-      // Validate comment before sending
-      if (!commentText || commentText.trim().length === 0) {
-        throw new Error("Comment cannot be empty");
-      }
-      if (commentText.length > 500) {
-        throw new Error("Comment must be 500 characters or less");
-      }
-  
       const response = await fetch('http://172.16.10.144:8000/write-comments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          post_id: postId,  // Ensure this is the correct type (number/string)
-          user_id: "current_user_id", // TODO: Replace with real user ID
-          comment_text: commentText.trim(), // Try both 'comment_text' and 'text'
-          // organization_id: null // Only include if required
+          post_id: postId,
+          user_id: "current_user_id", // Replace with actual user ID from your auth system
+          text: commentText
         })
       });
-  
-      const responseData = await response.json();
-      
+
       if (!response.ok) {
-        console.error('Backend validation error:', responseData);
-        throw new Error(responseData.detail || responseData.message || "Invalid comment format");
+        throw new Error('Failed to add comment: ${response.status}');
       }
-  
-      // Successful comment - add to list
-      setCommentList(prev => [responseData, ...prev]);
+
+      const newComment = await response.json();
+      setCommentList(prevComments => [newComment, ...prevComments]);
       
     } catch (err) {
-      console.error('Comment submission failed:', err);
-      setError(
-        err.message.includes("422") 
-          ? "Please write a comment (1-500 characters, no special formatting)"
-          : err.message
-      );
+      setError(err.message);
     }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    setCommentList(prevComments => 
+      prevComments.filter(comment => comment.comment_id !== commentId)
+    );
   };
 
   return (
     <div className="reaction-container">
-      {/* Error display (if any) */}
-      {error && (
-        <div className="error-message">
-          {error}
-          <button onClick={() => setError(null)}>×</button>
-        </div>
-      )}
-
       {/* Reaction Stats */}
       <div className="reaction-stats">
         <span className="reaction-count">{upvoteCount} 👍</span>
@@ -142,12 +137,20 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
 
       {/* Comment Section */}
       {showComments && (
-        <CommentSection
-          comments={commentList}
-          onAddComment={handleAddComment}
-          onClose={() => setShowComments(false)}
-          loading={loading}
-        />
+        <div className="comments-section">
+          {loading ? (
+            <div className="loading">Loading comments...</div>
+          ) : error ? (
+            <div className="error">Error: {error}</div>
+          ) : (
+            <CommentSection
+              comments={commentList}
+              onAddComment={handleAddComment}
+              onDeleteComment={handleDeleteComment}
+              onClose={() => setShowComments(false)}
+            />
+          )}
+        </div>
       )}
     </div>
   );
