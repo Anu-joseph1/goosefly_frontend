@@ -1,12 +1,12 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./Topbar.css"; // Ensure correct import
-import gooseLogo from "../assets/goose.jpeg"; // Use relative path
-import { FaSearch, FaArrowLeft, FaCog, FaBars, FaBell } from "react-icons/fa"; // Import icons
+import "./Topbar.css";
+import gooseLogo from "../assets/goose.jpeg";
+import { FaSearch, FaArrowLeft, FaCog, FaBars, FaBell } from "react-icons/fa";
 
-const TopBar = ({ toggleMenu }) => {
-  const location = useLocation(); // Get current route
-  const navigate = useNavigate(); // For back navigation
+const TopBar = ({ toggleMenu, currentUser, onLogout }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Check if we are on the Organization page
   const isOrganizationPage = location.pathname === "/organization";
@@ -21,9 +21,9 @@ const TopBar = ({ toggleMenu }) => {
           <FaCog className="icon" />
         </>
       ) : (
-        // Default TopBar Design
+        // Default TopBar Design with Authentication
         <>
-          <FaBars className="icon hamburger-menu" onClick={toggleMenu} /> {/* Hamburger menu */}
+          <FaBars className="icon hamburger-menu" onClick={toggleMenu} />
           <div className="logo-container">
             <img src={gooseLogo} alt="Goose Logo" className="logo-img" />
             <div className="logo-text">Goosefly</div>
@@ -31,6 +31,14 @@ const TopBar = ({ toggleMenu }) => {
           <div className="icons-container">
             <FaSearch className="icon search-icon" />
             <FaBell className="icon notification-icon" />
+            {currentUser && (
+              <div className="user-section">
+                <span className="username">Welcome, {currentUser}</span>
+                <button className="logout-button" onClick={onLogout}>
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}
