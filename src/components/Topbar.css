@@ -12,7 +12,7 @@
   font-size: 24px;
   cursor: pointer;
   color: black;
-  margin-right: 10px; /* Add spacing */
+  margin-right: 10px;
 }
 
 .title {
@@ -38,7 +38,7 @@
 }
 
 .topbar .logo-img {
-  height: 35px; /* Adjusted size */
+  height: 35px;
   width: auto;
   margin-right: 5px;
 }
@@ -53,9 +53,9 @@
 .icons-container {
   display: flex;
   align-items: center;
-  gap: 15px; /* Space between icons */
+  gap: 15px;
   position: absolute;
-  right: 15px; /* Aligned to the right */
+  right: 15px;
 }
 
 .search-icon {
@@ -64,7 +64,22 @@
 
 .notification-icon {
   font-size: 18px;
-  color: #ff9800; /* Orange color for notifications */
+  color: #ff9800;
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* Responsive Design */
@@ -83,11 +98,16 @@
   }
 
   .icons-container {
-    gap: 10px; /* Reduce spacing for smaller screens */
+    gap: 10px;
   }
 
   .search-icon,
   .notification-icon {
     font-size: 16px;
+  }
+  
+  .logout-button {
+    font-size: 12px;
+    padding: 4px 8px;
   }
 }

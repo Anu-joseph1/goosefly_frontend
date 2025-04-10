@@ -32,12 +32,9 @@ const TopBar = ({ toggleMenu, currentUser, onLogout }) => {
             <FaSearch className="icon search-icon" />
             <FaBell className="icon notification-icon" />
             {currentUser && (
-              <div className="user-section">
-                <span className="username">Welcome, {currentUser}</span>
-                <button className="logout-button" onClick={onLogout}>
-                  Logout
-                </button>
-              </div>
+              <button className="logout-button" onClick={onLogout}>
+                Logout
+              </button>
             )}
           </div>
         </>

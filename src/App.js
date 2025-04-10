@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import Amplify from 'aws-amplify';
+import { Auth } from 'aws-amplify';
 import './App.css';
 import TopBar from './components/Topbar';
 import SideNav from './components/SideNav';
@@ -8,24 +10,52 @@ import Page2 from './pages/Page2';
 import Page3 from './pages/Page3';
 import Page4 from './pages/page4';
 import Login from './components/Login';
+import awsExports from './awsExports';
+Amplify.Logger.LOG_LEVEL = 'DEBUG';
+
+// Configure Amplify
+Amplify.configure(awsExports);
+
+// Configure Auth module to use USER_PASSWORD_AUTH flow
+Auth.configure({
+  authenticationFlowType: 'USER_PASSWORD_AUTH'
+});
 
 function App() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
+
+  useEffect(() => {
+    const checkAuthState = async () => {
+      try {
+        const user = await Auth.currentAuthenticatedUser();
+        setCurrentUser(user.username);
+      } catch (err) {
+        setCurrentUser(null);
+      } finally {
+        setIsAuthenticating(false);
+      }
+    };
+
+    checkAuthState();
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
   const handleLogin = (username) => {
-    setIsAuthenticated(true);
     setCurrentUser(username);
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setCurrentUser(null);
+  const handleLogout = async () => {
+    try {
+      await Auth.signOut();
+      setCurrentUser(null);
+    } catch (error) {
+      console.error('Error signing out: ', error);
+    }
   };
 
   return (
@@ -33,16 +63,17 @@ function App() {
       <AppContent 
         isOpen={isOpen} 
         toggleMenu={toggleMenu} 
-        isAuthenticated={isAuthenticated} 
+        isAuthenticated={!!currentUser} 
         currentUser={currentUser}
         onLogin={handleLogin}
         onLogout={handleLogout}
+        isAuthenticating={isAuthenticating}
       />
     </Router>
   );
 }
 
-function AppContent({ isOpen, toggleMenu, isAuthenticated, currentUser, onLogin, onLogout }) {
+function AppContent({ isOpen, toggleMenu, isAuthenticated, currentUser, onLogin, onLogout, isAuthenticating }) {
   const location = useLocation();
 
   const shouldShowTopBar = 
@@ -56,13 +87,23 @@ function AppContent({ isOpen, toggleMenu, isAuthenticated, currentUser, onLogin,
     location.pathname !== "/organization" &&
     location.pathname !== "/login";
 
+  if (isAuthenticating) {
+    return <div className="loading-screen">Loading...</div>;
+  }
+
   if (!isAuthenticated && location.pathname !== "/login") {
     return <Navigate to="/login" replace />;
   }
 
   return (
     <div className="App">
-      {shouldShowTopBar && <TopBar toggleMenu={toggleMenu} currentUser={currentUser} onLogout={onLogout} />}
+      {shouldShowTopBar && (
+        <TopBar 
+          toggleMenu={toggleMenu} 
+          currentUser={currentUser} 
+          onLogout={onLogout} 
+        />
+      )}
       {shouldShowSideNav && <SideNav isOpen={isOpen} toggleMenu={toggleMenu} />}
       <div className="content">
         <Routes>
