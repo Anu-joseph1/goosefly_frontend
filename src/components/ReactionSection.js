@@ -10,33 +10,48 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch comments when comment section is opened
   useEffect(() => {
     const fetchComments = async () => {
-      if (showComments && postId) {
-        try {
-          setLoading(true);
-          setError(null);
-          
-          const response = await fetch(`http://172.16.10.144:8000/read-comments?post_id=${postId}`);
-          
-          if (!response.ok) {
-            throw new Error(`Failed to fetch comments: ${response.status}`);
-          }
-          
-          const data = await response.json();
-          setCommentList(data);
-        } catch (err) {
-          setError(err.message);
-          setCommentList([]);
-        } finally {
-          setLoading(false);
+      try {
+        setLoading(true);
+        setError(null);
+        console.log("Fetching comments...");
+
+        const response = await fetch(`http://172.16.10.144:8000/all-comments`);
+        console.log("Response status:", response.status);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch comments: ${response.status}`);
         }
+
+        const data = await response.json();
+        console.log("Fetched comments:", data);
+        
+        // Transform the data to match the expected format
+        const transformedComments = data.map(comment => ({
+          comment_id: comment.comment_id,
+          user: comment.user_name,
+          text: comment.text,
+          time: new Date(comment.created_at).toLocaleString(),
+          profile_pic: comment.profile_pic,
+          replies: comment.replies,
+          post_id: comment.post_id
+        }));
+        
+        console.log("Transformed comments:", transformedComments);
+        setCommentList(transformedComments);
+      } catch (err) {
+        console.error("Error fetching comments:", err);
+        setError(err.message);
+        setCommentList([]);
+      } finally {
+        setLoading(false);
       }
     };
 
+    // Fetch comments immediately when component mounts
     fetchComments();
-  }, [showComments, postId]);
+  }, []); // Remove showComments dependency to fetch on mount
 
   const handleUpvote = () => {
     if (isUpvoted) {
@@ -68,8 +83,6 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
       }
 
       const newComment = await response.json();
-      
-      // Update the comment list with the new comment
       setCommentList(prevComments => [newComment, ...prevComments]);
       
     } catch (err) {
@@ -78,27 +91,13 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
   };
 
   const handleDeleteComment = async (commentId) => {
-    // Since you haven't provided a delete endpoint, we'll implement a frontend-only delete
-    // Note: This will only remove the comment from the UI, not from the backend
-    // In a production app, you should implement a proper DELETE endpoint
     setCommentList(prevComments => 
       prevComments.filter(comment => comment.comment_id !== commentId)
     );
-    
-    // Show warning that this is frontend-only
-    setError("Note: Comment deletion is currently frontend-only. Refresh will bring it back.");
   };
 
   return (
     <div className="reaction-container">
-      {/* Error display */}
-      {error && (
-        <div className="error-message">
-          {error}
-          <button onClick={() => setError(null)}>×</button>
-        </div>
-      )}
-
       {/* Reaction Stats */}
       <div className="reaction-stats">
         <span className="reaction-count">{upvoteCount} 👍</span>
@@ -136,14 +135,22 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
         </div>
       </div>
 
+      {/* Comment Section */}
       {showComments && (
-        <CommentSection
-          comments={commentList}
-          onAddComment={handleAddComment}
-          onDeleteComment={handleDeleteComment}
-          onClose={() => setShowComments(false)}
-          loading={loading}
-        />
+        <div className="comments-section">
+          {loading ? (
+            <div className="loading">Loading comments...</div>
+          ) : error ? (
+            <div className="error">Error: {error}</div>
+          ) : (
+            <CommentSection
+              comments={commentList}
+              onAddComment={handleAddComment}
+              onDeleteComment={handleDeleteComment}
+              onClose={() => setShowComments(false)}
+            />
+          )}
+        </div>
       )}
     </div>
   );

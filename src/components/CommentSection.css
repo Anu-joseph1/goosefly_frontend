@@ -122,3 +122,16 @@
   .post-button:hover {
     background-color: #166fe5;
   }
+  
+  .comment-user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .comment-user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }

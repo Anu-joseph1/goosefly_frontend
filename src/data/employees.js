@@ -23,7 +23,7 @@ export const employees = [
       upvotes: 12,
       comments: 18,
       plant: 2,
-     
+ 
     },
     {
       id: 3,

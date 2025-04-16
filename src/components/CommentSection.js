@@ -7,6 +7,9 @@ const CommentSection = ({ comments, onAddComment, onClose, onDeleteComment }) =>
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
 
+  // Add console log to check received comments
+  console.log("CommentSection received comments:", comments);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newComment.trim()) {
@@ -50,24 +53,37 @@ const CommentSection = ({ comments, onAddComment, onClose, onDeleteComment }) =>
       </div>
       
       <div className="comments-list">
-        {comments.map((comment, index) => (
-          <div key={index} className="comment-item">
-            <div className="comment-header">
-              <span className="comment-user">{comment.user}</span>
-              <span className="comment-time">{comment.time}</span>
+        {comments && comments.length > 0 ? (
+          comments.map((comment) => (
+            <div key={comment.comment_id} className="comment-item">
+              <div className="comment-header">
+                <div className="comment-user-info">
+                  {comment.profile_pic && (
+                    <img 
+                      src={comment.profile_pic} 
+                      alt={comment.user} 
+                      className="comment-user-avatar"
+                    />
+                  )}
+                  <span className="comment-user">{comment.user}</span>
+                </div>
+                <span className="comment-time">{comment.time}</span>
+              </div>
+              {comment.text && <div className="comment-text">{comment.text}</div>}
+              <div className="comment-actions">
+                <button className="reply-button">Reply</button>
+                <button 
+                  className="delete-button"
+                  onClick={() => handleDeleteClick(comment.comment_id)}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-            {comment.text && <div className="comment-text">{comment.text}</div>}
-            <div className="comment-actions">
-              <button className="reply-button">Reply</button>
-              <button 
-                className="delete-button"
-                onClick={() => handleDeleteClick(index)}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <div className="no-comments">No comments yet. Be the first to comment!</div>
+        )}
       </div>
       
       <form onSubmit={handleSubmit} className="add-comment-form">

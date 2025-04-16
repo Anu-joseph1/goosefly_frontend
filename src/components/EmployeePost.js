@@ -25,10 +25,15 @@ const EmployeePost = ({ employee, goToProfile }) => {
         name={employee.name}
         designation={employee.designation}
         postTime={employee.postTime}
-        goToProfile={goToProfile}
+        goToProfile={() => goToProfile(employee.user_id)}
       />
       <ActivitySection postImage={employee.postImage} caption={employee.caption} />
-      <ReactionSection upvotes={employee.upvotes} shares={employee.shares} />
+      <ReactionSection 
+        upvotes={employee.upvotes} 
+        shares={employee.shares} 
+        comments={employee.comments}
+        postId={employee.post_id}
+      />
     </div>
   );
 };

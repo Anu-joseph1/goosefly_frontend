@@ -1,62 +1,90 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import EmployeePost from "../components/EmployeePost";
-import { employees } from "../data/employees";
 import { FaArrowLeft, FaPlus, FaBell } from "react-icons/fa";
 import "./page4.css";
 
 const Page4 = () => {
-  const { employeeId } = useParams();
+  const { userId } = useParams();
   const navigate = useNavigate();
-  const [employeePosts, setEmployeePosts] = useState([]);
-  const [employeeDetails, setEmployeeDetails] = useState(null);
+  const [userPosts, setUserPosts] = useState([]);
+  const [userDetails, setUserDetails] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    designation: "",
-    industry: "",
-    bio: "",
-  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const selectedEmployee = employees.find((emp) => emp.id === parseInt(employeeId));
-    if (selectedEmployee) {
-      setEmployeeDetails(selectedEmployee);
-      setFormData({
-        name: selectedEmployee.name,
-        designation: selectedEmployee.designation,
-        industry: selectedEmployee.industry || "",
-        bio: selectedEmployee.bio,
-      });
-      const filteredPosts = employees.filter((emp) => emp.id === parseInt(employeeId));
-      setEmployeePosts(filteredPosts);
-    }
-  }, [employeeId]);
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch user details
+        const userResponse = await fetch(`http://172.16.10.144:8000/all`);
+        if (!userResponse.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        const users = await userResponse.json();
+        const user = users.find(u => u.user_id === userId);
+        
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        // Fetch user's posts
+        const postsResponse = await fetch("http://172.16.10.144:8000/all-posts");
+        if (!postsResponse.ok) {
+          throw new Error("Failed to fetch posts");
+        }
+        const postsData = await postsResponse.json();
+        const userPosts = postsData.posts
+          .filter(post => post.user_id === userId)
+          .map(post => ({
+            post_id: post.post_id,
+            user_id: post.user_id,
+            name: user.name,
+            designation: user.designation,
+            profilePic: user.profile_pic,
+            postImage: post.image_url,
+            caption: post.caption,
+            postTime: post.created_at,
+            upvotes: user.upvotes || 0,
+            comments: user.comments || 0,
+            shares: user.shares || 0,
+            plant: post.plant || 1
+          }));
+
+        setUserDetails(user);
+        setUserPosts(userPosts);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [userId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setUserDetails(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setEmployeeDetails({
-      ...employeeDetails,
-      ...formData,
-    });
-    setIsModalOpen(false);
-  };
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-  const togglePopup = () => {
-    setIsPopupOpen(!isPopupOpen);
-  };
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
-  if (!employeeDetails) {
-    return <div>Employee not found.</div>;
+  if (!userDetails) {
+    return <div>User not found</div>;
   }
 
   return (
@@ -66,96 +94,33 @@ const Page4 = () => {
         <div className="header">
           <FaArrowLeft className="back" onClick={() => navigate(-1)} />
           <div className="profile-content">
-            <img src={employeeDetails.profilePic} alt="Profile" className="image" />
+            <img src={userDetails.profile_pic} alt="Profile" className="image" />
             <div className="details">
-              <h2 className="name">{employeeDetails.name}</h2>
-              <p className="text">{employeeDetails.designation}</p>
-              <p className="text">@{employeeDetails.username}</p>
-              <p className="text">{employeeDetails.bio}</p>
+              <h2 className="name">{userDetails.name}</h2>
+              <p className="text">{userDetails.designation}</p>
+              <p className="text">@{userDetails.username}</p>
+              <p className="text">{userDetails.bio}</p>
               <div className="stats">
-                <button className="btn" onClick={() => setIsModalOpen(true)}>
-                  Edit Profile
-                </button>
                 <div className="numbers">
-                  <span className="text">{employeeDetails.followers} Followers</span>
-                  <span className="text">{employeeDetails.experts} Experts</span>
+                  <span className="text">{userDetails.followers || 0} Followers</span>
+                  <span className="text">{userDetails.experts || 0} Experts</span>
                 </div>
               </div>
-            </div>
-          </div>
-          {/* Actions */}
-          <div className="actions">
-            <FaBell className="icon notification" />
-            <div className="popup">
-              <FaPlus className="icon popup" onClick={togglePopup} />
-              {isPopupOpen && (
-                <div className="menu">
-                  <div className="item">New Post</div>
-                  <div className="item">Create a New Issue</div>
-                  <div className="item">Add a Suggestion</div>
-                </div>
-              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Employee Posts */}
-      {employeePosts.map((post) => (
-        <EmployeePost key={post.id} employee={post} goToProfile={() => {}} />
-      ))}
-
-      {/* Edit Profile Modal */}
-      {isModalOpen && (
-        <div className="overlay">
-          <div className="modal">
-            <h2>Edit Profile</h2>
-            <form onSubmit={handleSubmit}>
-              <label>
-                Name:
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <label>
-                Designation:
-                <input
-                  type="text"
-                  name="designation"
-                  value={formData.designation}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <label>
-                Industry:
-                <input
-                  type="text"
-                  name="industry"
-                  value={formData.industry}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <label>
-                Bio:
-                <textarea
-                  name="bio"
-                  value={formData.bio}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <div className="buttons">
-                <button type="submit">Save</button>
-                <button type="button" onClick={() => setIsModalOpen(false)}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* User's Posts */}
+      <div className="posts-container">
+        {userPosts.map((post) => (
+          <EmployeePost
+            key={post.post_id}
+            employee={post}
+            goToProfile={() => {}}
+          />
+        ))}
+      </div>
     </div>
   );
 };
