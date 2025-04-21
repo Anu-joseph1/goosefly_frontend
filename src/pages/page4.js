@@ -1,9 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import EmployeePost from "../components/EmployeePost";
-import { employees } from "../data/employees";
 import { FaArrowLeft, FaPlus, FaBell } from "react-icons/fa";
 import "./page4.css";
+
+// Constants
+const API_BASE = "http://172.16.10.144:8000";
+
+// Utility functions
+const fetchWithRetry = async (url, options = {}, retries = 3) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) return response;
+      throw new Error(`HTTP error! status: ${response.status}`);
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+    }
+  }
+};
+
+const handleApiError = (error) => {
+  console.error("API Error:", error);
+  if (error.message.includes("Failed to fetch")) {
+    return "Network error - please check your connection";
+  }
+  return error.message || "An unknown error occurred";
+};
 
 const Page4 = () => {
   const { employeeId } = useParams();
@@ -12,6 +36,8 @@ const Page4 = () => {
   const [employeeDetails, setEmployeeDetails] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     designation: "",
@@ -20,18 +46,91 @@ const Page4 = () => {
   });
 
   useEffect(() => {
-    const selectedEmployee = employees.find((emp) => emp.id === parseInt(employeeId));
-    if (selectedEmployee) {
-      setEmployeeDetails(selectedEmployee);
-      setFormData({
-        name: selectedEmployee.name,
-        designation: selectedEmployee.designation,
-        industry: selectedEmployee.industry || "",
-        bio: selectedEmployee.bio,
-      });
-      const filteredPosts = employees.filter((emp) => emp.id === parseInt(employeeId));
-      setEmployeePosts(filteredPosts);
-    }
+    const fetchEmployeeData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Try multiple endpoint variations
+        const endpoints = [
+          `${API_BASE}/by_id?user_id=${employeeId}`,
+          `${API_BASE}/by_id?id=${employeeId}`,
+          `${API_BASE}/users/${employeeId}`
+        ];
+        
+        let userData = null;
+        let postsData = { posts: [] };
+        
+        // Try each endpoint until one works
+        for (const endpoint of endpoints) {
+          try {
+            const userResponse = await fetchWithRetry(endpoint);
+            userData = await userResponse.json();
+            if (userData) break;
+          } catch (e) {
+            console.log(`Attempt failed for ${endpoint}`);
+          }
+        }
+        
+        if (!userData) {
+          throw new Error("Failed to fetch employee data from all endpoints");
+        }
+
+        // Try to fetch posts
+        try {
+          const postsResponse = await fetchWithRetry(
+            `${API_BASE}/posts_by_user?user_id=${employeeId}`
+          );
+          if (postsResponse.ok) {
+            postsData = await postsResponse.json();
+          }
+        } catch (e) {
+          console.error("Failed to fetch posts, using empty array", e);
+        }
+
+        setEmployeeDetails(userData);
+        setEmployeePosts(postsData.posts || []);
+        setFormData({
+          name: userData.name || "",
+          designation: userData.designation || "",
+          industry: userData.industry || "",
+          bio: userData.bio || "",
+        });
+      } catch (err) {
+        const errorMessage = handleApiError(err);
+        setError(errorMessage);
+        
+        // Fallback to dummy data if in development
+        if (process.env.NODE_ENV === 'development') {
+          console.warn("Using dummy data as fallback");
+          const dummyData = {
+            user_id: employeeId,
+            name: "Dummy User",
+            designation: "Developer",
+            profile_pic: "default-profile.jpg",
+            bio: "This is dummy data",
+            username: "dummyuser",
+            followers: 42,
+            experts: 7
+          };
+          setEmployeeDetails(dummyData);
+          setEmployeePosts([{
+            post_id: 1,
+            caption: "Sample post from dummy data",
+            created_at: new Date().toISOString(),
+            upvotes: 0,
+            comments: 0,
+            shares: 0,
+            image_url: "default-post.jpg"
+          }]);
+          setError(null);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmployeeData();
   }, [employeeId]);
 
   const handleInputChange = (e) => {
@@ -55,8 +154,39 @@ const Page4 = () => {
     setIsPopupOpen(!isPopupOpen);
   };
 
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading profile...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <h3>Error Loading Profile</h3>
+        <p>{error}</p>
+        <div className="error-actions">
+          <button onClick={() => window.location.reload()}>Retry</button>
+          <button onClick={() => navigate(-1)}>Go Back</button>
+          {process.env.NODE_ENV === 'development' && (
+            <button onClick={() => console.error(error)}>View Error Details</button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   if (!employeeDetails) {
-    return <div>Employee not found.</div>;
+    return (
+      <div className="not-found-container">
+        <h3>Employee Not Found</h3>
+        <p>The requested employee profile could not be found.</p>
+        <button onClick={() => navigate(-1)}>Go Back</button>
+      </div>
+    );
   }
 
   return (
@@ -66,19 +196,26 @@ const Page4 = () => {
         <div className="header">
           <FaArrowLeft className="back" onClick={() => navigate(-1)} />
           <div className="profile-content">
-            <img src={employeeDetails.profilePic} alt="Profile" className="image" />
+            <img 
+              src={employeeDetails.profile_pic || "default-profile.jpg"} 
+              alt="Profile" 
+              className="image"
+              onError={(e) => {
+                e.target.src = "default-profile.jpg";
+              }}
+            />
             <div className="details">
               <h2 className="name">{employeeDetails.name}</h2>
               <p className="text">{employeeDetails.designation}</p>
-              <p className="text">@{employeeDetails.username}</p>
+              <p className="text">@{employeeDetails.username || employeeDetails.name.replace(/\s+/g, '').toLowerCase()}</p>
               <p className="text">{employeeDetails.bio}</p>
               <div className="stats">
                 <button className="btn" onClick={() => setIsModalOpen(true)}>
                   Edit Profile
                 </button>
                 <div className="numbers">
-                  <span className="text">{employeeDetails.followers} Followers</span>
-                  <span className="text">{employeeDetails.experts} Experts</span>
+                  <span className="text">{employeeDetails.followers || 0} Followers</span>
+                  <span className="text">{employeeDetails.experts || 0} Experts</span>
                 </div>
               </div>
             </div>
@@ -90,9 +227,9 @@ const Page4 = () => {
               <FaPlus className="icon popup" onClick={togglePopup} />
               {isPopupOpen && (
                 <div className="menu">
-                  <div className="item">New Post</div>
-                  <div className="item">Create a New Issue</div>
-                  <div className="item">Add a Suggestion</div>
+                  <div className="item" onClick={() => navigate('/create-post')}>New Post</div>
+                  <div className="item" onClick={() => navigate('/create-issue')}>Create a New Issue</div>
+                  <div className="item" onClick={() => navigate('/add-suggestion')}>Add a Suggestion</div>
                 </div>
               )}
             </div>
@@ -101,9 +238,26 @@ const Page4 = () => {
       </div>
 
       {/* Employee Posts */}
-      {employeePosts.map((post) => (
-        <EmployeePost key={post.id} employee={post} goToProfile={() => {}} />
-      ))}
+      <div className="posts-container">
+        {employeePosts.length > 0 ? (
+          employeePosts.map((post) => (
+            <EmployeePost 
+              key={post.post_id} 
+              employee={{
+                ...post,
+                name: employeeDetails.name,
+                designation: employeeDetails.designation,
+                profile_pic: employeeDetails.profile_pic
+              }} 
+              goToProfile={() => {}} 
+            />
+          ))
+        ) : (
+          <div className="no-posts">
+            <p>No posts available for this employee</p>
+          </div>
+        )}
+      </div>
 
       {/* Edit Profile Modal */}
       {isModalOpen && (
@@ -118,6 +272,7 @@ const Page4 = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
+                  required
                 />
               </label>
               <label>
@@ -127,6 +282,7 @@ const Page4 = () => {
                   name="designation"
                   value={formData.designation}
                   onChange={handleInputChange}
+                  required
                 />
               </label>
               <label>
@@ -144,6 +300,7 @@ const Page4 = () => {
                   name="bio"
                   value={formData.bio}
                   onChange={handleInputChange}
+                  rows="4"
                 />
               </label>
               <div className="buttons">

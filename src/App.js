@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 import TopBar from './components/Topbar';
@@ -7,12 +7,22 @@ import Page1 from './pages/Page1';
 import Page2 from './pages/Page2';
 import Page3 from './pages/Page3';
 import Page4 from './pages/page4';
+
 import Login from './components/Login';
 
 function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+
+  // ✅ Load from localStorage on first render
+  useEffect(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      setCurrentUser(storedUser);
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -21,11 +31,13 @@ function App() {
   const handleLogin = (username) => {
     setIsAuthenticated(true);
     setCurrentUser(username);
+    localStorage.setItem('currentUser', username); // ✅ Save user
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setCurrentUser(null);
+    localStorage.removeItem('currentUser'); // ✅ Clear storage on logout
   };
 
   return (
@@ -71,6 +83,7 @@ function AppContent({ isOpen, toggleMenu, isAuthenticated, currentUser, onLogin,
           <Route path="/report" element={<Page2 />} />
           <Route path="/organization" element={<Page3 />} />
           <Route path="/profile/:employeeId" element={<Page4 />} />
+         
         </Routes>
       </div>
     </div>

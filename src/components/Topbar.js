@@ -33,7 +33,6 @@ const TopBar = ({ toggleMenu, currentUser, onLogout }) => {
             <FaBell className="icon notification-icon" />
             {currentUser && (
               <div className="user-section">
-                <span className="username">Welcome, {currentUser}</span>
                 <button className="logout-button" onClick={onLogout}>
                   Logout
                 </button>

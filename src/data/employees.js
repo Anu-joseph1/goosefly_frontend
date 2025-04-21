@@ -1,14 +1,14 @@
 export const employees = [
     {
       id: 1,
-      name: "John Doe",
-      designation: "Software Engineer",
+      name: "Anu Jozf",
+      designation: "fullstack developer",
       postTime: "2 hours ago",
       profilePic: require("../assets/profile.jpg"),
       postImage: require("../assets/post.jpg"),
-      caption: "Robotics is the interdisciplinary study and practice of the design, construction, operation, and use of robots.",
+      caption: "this if bdfhsoig",
       upvotes: 7,
-      Comments: 11,
+      Comments: 7,
       plant: 1,
       
     },
