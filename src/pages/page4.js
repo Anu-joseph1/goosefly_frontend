@@ -51,51 +51,45 @@ const Page4 = () => {
         setLoading(true);
         setError(null);
         
-        // Try multiple endpoint variations
-        const endpoints = [
-          `${API_BASE}/by_id?user_id=${employeeId}`,
-          `${API_BASE}/by_id?id=${employeeId}`,
-          `${API_BASE}/users/${employeeId}`
-        ];
-        
-        let userData = null;
-        let postsData = { posts: [] };
-        
-        // Try each endpoint until one works
-        for (const endpoint of endpoints) {
-          try {
-            const userResponse = await fetchWithRetry(endpoint);
-            userData = await userResponse.json();
-            if (userData) break;
-          } catch (e) {
-            console.log(`Attempt failed for ${endpoint}`);
-          }
-        }
-        
-        if (!userData) {
-          throw new Error("Failed to fetch employee data from all endpoints");
+        // Fetch user data using /by_id endpoint
+        try {
+          const userResponse = await fetchWithRetry(
+            `${API_BASE}/by_id?user_id=${employeeId}`
+          );
+          const userData = await userResponse.json();
+          setEmployeeDetails(userData);
+          setFormData({
+            name: userData.name || "",
+            designation: userData.designation || "",
+            industry: userData.industry || "",
+            bio: userData.bio || "",
+          });
+        } catch (userError) {
+          throw new Error("Failed to fetch employee data");
         }
 
-        // Try to fetch posts
+        // Fetch posts using /posts-by-user endpoint
         try {
           const postsResponse = await fetchWithRetry(
-            `${API_BASE}/posts_by_user?user_id=${employeeId}`
+            `${API_BASE}/posts-by-user/${employeeId}`
           );
-          if (postsResponse.ok) {
-            postsData = await postsResponse.json();
-          }
-        } catch (e) {
-          console.error("Failed to fetch posts, using empty array", e);
+          const postsData = await postsResponse.json();
+          // Transform S3 image data into post format
+          const transformedPosts = postsData.images.map((image, index) => ({
+            post_id: index + 1, // Generate a simple ID since we don't have one from S3
+            image_url: image.image_url,
+            caption: "", // You might want to add caption from metadata if available
+            created_at: image.last_modified,
+            upvotes: 0,
+            comments: 0,
+            shares: 0
+          }));
+          setEmployeePosts(transformedPosts);
+        } catch (postsError) {
+          console.error("Failed to fetch posts, using empty array", postsError);
+          setEmployeePosts([]);
         }
 
-        setEmployeeDetails(userData);
-        setEmployeePosts(postsData.posts || []);
-        setFormData({
-          name: userData.name || "",
-          designation: userData.designation || "",
-          industry: userData.industry || "",
-          bio: userData.bio || "",
-        });
       } catch (err) {
         const errorMessage = handleApiError(err);
         setError(errorMessage);
@@ -133,6 +127,7 @@ const Page4 = () => {
     fetchEmployeeData();
   }, [employeeId]);
 
+  // ... [rest of the component remains exactly the same]
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
