@@ -7,7 +7,7 @@ import Page1 from './pages/Page1';
 import Page2 from './pages/Page2';
 import Page3 from './pages/Page3';
 import Page4 from './pages/page4';
-
+import Page5 from './pages/page5';
 import Login from './components/Login';
 
 function App() {
@@ -15,7 +15,6 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
-  // ✅ Load from localStorage on first render
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
@@ -31,13 +30,13 @@ function App() {
   const handleLogin = (username) => {
     setIsAuthenticated(true);
     setCurrentUser(username);
-    localStorage.setItem('currentUser', username); // ✅ Save user
+    localStorage.setItem('currentUser', username);
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setCurrentUser(null);
-    localStorage.removeItem('currentUser'); // ✅ Clear storage on logout
+    localStorage.removeItem('currentUser');
   };
 
   return (
@@ -61,12 +60,14 @@ function AppContent({ isOpen, toggleMenu, isAuthenticated, currentUser, onLogin,
     location.pathname !== "/report" && 
     location.pathname !== "/organization" && 
     !location.pathname.startsWith("/profile/") &&
-    location.pathname !== "/login";
+    location.pathname !== "/login" &&
+    location.pathname !== "/my-profile";
 
   const shouldShowSideNav = 
     location.pathname !== "/report" && 
     location.pathname !== "/organization" &&
-    location.pathname !== "/login";
+    location.pathname !== "/login" &&
+    location.pathname !== "/my-profile";
 
   if (!isAuthenticated && location.pathname !== "/login") {
     return <Navigate to="/login" replace />;
@@ -75,7 +76,7 @@ function AppContent({ isOpen, toggleMenu, isAuthenticated, currentUser, onLogin,
   return (
     <div className="App">
       {shouldShowTopBar && <TopBar toggleMenu={toggleMenu} currentUser={currentUser} onLogout={onLogout} />}
-      {shouldShowSideNav && <SideNav isOpen={isOpen} toggleMenu={toggleMenu} />}
+      {shouldShowSideNav && <SideNav isOpen={isOpen} toggleMenu={toggleMenu} currentUser={currentUser} />}
       <div className="content">
         <Routes>
           <Route path="/login" element={<Login onLogin={onLogin} />} />
@@ -83,7 +84,7 @@ function AppContent({ isOpen, toggleMenu, isAuthenticated, currentUser, onLogin,
           <Route path="/report" element={<Page2 />} />
           <Route path="/organization" element={<Page3 />} />
           <Route path="/profile/:employeeId" element={<Page4 />} />
-         
+          <Route path="/my-profile" element={<Page5 currentUser={currentUser} />} />
         </Routes>
       </div>
     </div>
