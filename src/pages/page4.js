@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import EmployeePost from "../components/EmployeePost";
-import { FaArrowLeft, FaPlus, FaBell } from "react-icons/fa";
+import { FaArrowLeft, FaPlus, FaBell, FaEnvelope } from "react-icons/fa";
 import "./page4.css";
 
 // Constants
@@ -34,7 +34,6 @@ const Page4 = () => {
   const navigate = useNavigate();
   const [employeePosts, setEmployeePosts] = useState([]);
   const [employeeDetails, setEmployeeDetails] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -76,9 +75,9 @@ const Page4 = () => {
           const postsData = await postsResponse.json();
           // Transform S3 image data into post format
           const transformedPosts = postsData.images.map((image, index) => ({
-            post_id: index + 1, // Generate a simple ID since we don't have one from S3
+            post_id: index + 1,
             image_url: image.image_url,
-            caption: "", // You might want to add caption from metadata if available
+            caption: "",
             created_at: image.last_modified,
             upvotes: 0,
             comments: 0,
@@ -94,7 +93,6 @@ const Page4 = () => {
         const errorMessage = handleApiError(err);
         setError(errorMessage);
         
-        // Fallback to dummy data if in development
         if (process.env.NODE_ENV === 'development') {
           console.warn("Using dummy data as fallback");
           const dummyData = {
@@ -127,22 +125,12 @@ const Page4 = () => {
     fetchEmployeeData();
   }, [employeeId]);
 
-  // ... [rest of the component remains exactly the same]
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
+  const handleMessageClick = () => {
+    navigate(`/chat/${employeeId}`, {
+      state: {
+        recipient: employeeDetails
+      }
     });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setEmployeeDetails({
-      ...employeeDetails,
-      ...formData,
-    });
-    setIsModalOpen(false);
   };
 
   const togglePopup = () => {
@@ -205,8 +193,8 @@ const Page4 = () => {
               <p className="text">@{employeeDetails.username || employeeDetails.name.replace(/\s+/g, '').toLowerCase()}</p>
               <p className="text">{employeeDetails.bio}</p>
               <div className="stats">
-                <button className="btn" onClick={() => setIsModalOpen(true)}>
-                  Edit Profile
+                <button className="btn message-btn" onClick={handleMessageClick}>
+                  <FaEnvelope className="message-icon" /> Message
                 </button>
                 <div className="numbers">
                   <span className="text">{employeeDetails.followers || 0} Followers</span>
@@ -253,61 +241,6 @@ const Page4 = () => {
           </div>
         )}
       </div>
-
-      {/* Edit Profile Modal */}
-      {isModalOpen && (
-        <div className="overlay">
-          <div className="modal">
-            <h2>Edit Profile</h2>
-            <form onSubmit={handleSubmit}>
-              <label>
-                Name:
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
-              <label>
-                Designation:
-                <input
-                  type="text"
-                  name="designation"
-                  value={formData.designation}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
-              <label>
-                Industry:
-                <input
-                  type="text"
-                  name="industry"
-                  value={formData.industry}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <label>
-                Bio:
-                <textarea
-                  name="bio"
-                  value={formData.bio}
-                  onChange={handleInputChange}
-                  rows="4"
-                />
-              </label>
-              <div className="buttons">
-                <button type="submit">Save</button>
-                <button type="button" onClick={() => setIsModalOpen(false)}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
