@@ -88,7 +88,7 @@
 
 /* Activity Section */
 .activity-container {
-    width: 100%;
+    width: 95%;
     background: #f8f9fa;
     padding: 10px;
     text-align: center;
@@ -189,7 +189,7 @@
     border-bottom: 1px solid #ddd; /* Bottom border for separation */
     border-top-left-radius: 10px; /* Rounded corners to match the container */
     border-top-right-radius: 10px; /* Rounded corners to match the container */
-    width: 105%; /* Full width */
+    width: 100%; /* Full width */
     box-sizing: border-box; /* Include padding in width */
 }
 

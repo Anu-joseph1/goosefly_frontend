@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./page1.css";
 import EmployeePost from "../components/EmployeePost";
+import ReactionSection from "../components/ReactionSection";
 
 const API_BASE_URL = "http://172.16.10.13:8000";
 
@@ -17,69 +18,49 @@ const Page1 = ({ isOpen }) => {
         setLoading(true);
         setError(null);
 
-        // Fetch data from all three endpoints simultaneously
-        const [userResponse, postResponse, commentsResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/all`),
-          fetch(`${API_BASE_URL}/all-posts`),
-          fetch(`${API_BASE_URL}/all-comments`),
+        const fetchWithTimeout = (url, options = {}, timeout = 8000) => {
+          return Promise.race([
+            fetch(url, options),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Request timeout')), timeout)
+            )
+          ]);
+        };
+
+        // Only fetch users and posts now
+        const [userResponse, postResponse] = await Promise.all([
+          fetchWithTimeout(`${API_BASE_URL}/all`).catch(e => { throw new Error(`Users: ${e.message}`) }),
+          fetchWithTimeout(`${API_BASE_URL}/all-posts`).catch(e => { throw new Error(`Posts: ${e.message}`) })
         ]);
 
-        // Check if all responses are OK
-        if (!userResponse.ok || !postResponse.ok || !commentsResponse.ok) {
-          throw new Error("Failed to fetch data from one or more endpoints");
-        }
+        if (!userResponse.ok) throw new Error(`User data failed: ${userResponse.status}`);
+        if (!postResponse.ok) throw new Error(`Post data failed: ${postResponse.status}`);
 
-        // Parse JSON responses
-        const [userData, postData, commentsData] = await Promise.all([
+        const [userData, postData] = await Promise.all([
           userResponse.json(),
-          postResponse.json(),
-          commentsResponse.json(),
+          postResponse.json()
         ]);
 
         // Create a map of users for quick lookup
-        const userMap = new Map(
-          userData.map(user => [user.user_id, user])
-        );
+        const userMap = new Map(userData.map(user => [user.user_id, user]));
 
-        // Create a map of comments grouped by post_id
-        const commentsMap = new Map();
-        if (Array.isArray(commentsData)) {
-          commentsData.forEach(comment => {
-            if (!comment.post_id) return; // Skip if post_id is missing
-            
-            if (!commentsMap.has(comment.post_id)) {
-              commentsMap.set(comment.post_id, []);
-            }
-            commentsMap.get(comment.post_id).push({
-              comment_id: comment.comment_id,
-              user_id: comment.user_id,
-              text: comment.text,
-              created_at: comment.created_at,
-              replies: comment.replies || []
-            });
-          });
-        }
-
-        // Combine posts with user data and comments
-        const combined = postData.posts.map(post => {
+        // Combine posts with user data (without comments)
+        const combined = postData.posts?.map(post => {
           const user = userMap.get(post.user_id) || {};
-          const postComments = commentsMap.get(post.post_id) || [];
           
           return {
             post_id: post.post_id,
             user_id: post.user_id,
-            name: user.name,
-            designation: user.designation,
-            profile_pic: user.profile_pic,
-            image_url: post.image_url,
-            caption: post.caption,
+            name: user.name || "Unknown",
+            designation: user.designation || "",
+            profile_pic: user.profile_pic || "",
+            image_url: post.image_url || "",
+            caption: post.caption || "",
             created_at: post.created_at,
             upvotes: user.upvotes || 0,
-            comments: postComments, // Array of comment objects
-            commentCount: postComments.length, // Total number of comments
             shares: user.shares || 0
           };
-        });
+        }) || [];
 
         setCombinedPosts(combined);
       } catch (err) {
@@ -118,11 +99,17 @@ const Page1 = ({ isOpen }) => {
   return (
     <div className="page1-container">
       {combinedPosts.map((post) => (
-        <EmployeePost
-          key={post.post_id}
-          employee={post}
-          goToProfile={() => goToProfile(post.user_id)}
-        />
+        <div key={post.post_id} className="post-container">
+          <EmployeePost
+            employee={post}
+            goToProfile={() => goToProfile(post.user_id)}
+          />
+          <ReactionSection
+            upvotes={post.upvotes}
+            shares={post.shares}
+            postId={post.post_id}
+          />
+        </div>
       ))}
     </div>
   );
