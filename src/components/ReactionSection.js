@@ -17,7 +17,7 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
         setError(null);
         console.log("Fetching comments...");
 
-        const response = await fetch('http://172.16.10.144:8000/all-comments');
+        const response = await fetch('http://172.16.10.13:8000/all-comments');
         console.log("Response status:", response.status);
 
         if (!response.ok) {
@@ -66,7 +66,7 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
     try {
       setError(null);
       
-      const response = await fetch('http://172.16.10.144:8000/write-comments', {
+      const response = await fetch('http://172.16.10.13:8000/write-comments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
