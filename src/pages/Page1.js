@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./page1.css";
 import EmployeePost from "../components/EmployeePost";
+import ReactionSection from "../components/ReactionSection";
 
 const API_BASE_URL = "http://172.16.10.13:8000";
 
@@ -98,12 +99,11 @@ const Page1 = ({ isOpen }) => {
   return (
     <div className="page1-container">
       {combinedPosts.map((post) => (
-        <div key={post.post_id} className="post-container">
-          <EmployeePost
-            employee={post}
-            goToProfile={() => goToProfile(post.user_id)}
-          />
-        </div>
+        <EmployeePost
+          key={post.post_id}
+          employee={post}
+          goToProfile={() => goToProfile(post.user_id)}
+        />
       ))}
     </div>
   );
