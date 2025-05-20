@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./page1.css";
 import EmployeePost from "../components/EmployeePost";
-import ReactionSection from "../components/ReactionSection";
 
 const API_BASE_URL = "http://172.16.10.13:8000";
 
@@ -103,11 +102,6 @@ const Page1 = ({ isOpen }) => {
           <EmployeePost
             employee={post}
             goToProfile={() => goToProfile(post.user_id)}
-          />
-          <ReactionSection
-            upvotes={post.upvotes}
-            shares={post.shares}
-            postId={post.post_id}
           />
         </div>
       ))}
