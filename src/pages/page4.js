@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import EmployeePost from "../components/EmployeePost";
-import { FaArrowLeft, FaPlus, FaBell, FaEnvelope } from "react-icons/fa";
+import { FaArrowLeft, FaEllipsisV, FaEnvelope } from "react-icons/fa";
 import "./page4.css";
 
 // Constants
@@ -34,7 +34,7 @@ const Page4 = () => {
   const navigate = useNavigate();
   const [employeePosts, setEmployeePosts] = useState([]);
   const [employeeDetails, setEmployeeDetails] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
@@ -133,8 +133,8 @@ const Page4 = () => {
     });
   };
 
-  const togglePopup = () => {
-    setIsPopupOpen(!isPopupOpen);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
   if (loading) {
@@ -205,14 +205,14 @@ const Page4 = () => {
           </div>
           {/* Actions */}
           <div className="actions">
-            <FaBell className="icon notification" />
-            <div className="popup">
-              <FaPlus className="icon popup" onClick={togglePopup} />
-              {isPopupOpen && (
-                <div className="menu">
-                  <div className="item" onClick={() => navigate('/create-post')}>New Post</div>
-                  <div className="item" onClick={() => navigate('/create-issue')}>Create a New Issue</div>
-                  <div className="item" onClick={() => navigate('/add-suggestion')}>Add a Suggestion</div>
+            <div className="menu-container">
+              <FaEllipsisV className="icon menu-icon" onClick={toggleMenu} />
+              {isMenuOpen && (
+                <div className="dropdown-menu">
+                  <div className="menu-item" onClick={() => navigate('/create-post')}>New Post</div>
+                  <div className="menu-item" onClick={() => navigate('/create-issue')}>Create Issue</div>
+                  <div className="menu-item" onClick={() => navigate('/add-suggestion')}>Add Suggestion</div>
+                  <div className="menu-item" onClick={() => navigate('/settings')}>Settings</div>
                 </div>
               )}
             </div>

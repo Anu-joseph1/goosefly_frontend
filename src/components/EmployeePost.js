@@ -2,12 +2,11 @@ import React from "react";
 import ProfileSection from "./ProfileSection";
 import ActivitySection from "./ActivitySection";
 import ReactionSection from "./ReactionSection";
-import { FaEllipsisH } from "react-icons/fa"; // Import ellipsis icon
+import { FaEllipsisH } from "react-icons/fa";
 
 const EmployeePost = ({ employee, goToProfile }) => {
   return (
     <div className="employee-post">
-      {/* New Header with Ellipsis */}
       <div className="post-header">
         <span>
           {employee.type === "issue"
@@ -19,16 +18,23 @@ const EmployeePost = ({ employee, goToProfile }) => {
         </div>
       </div>
 
-      {/* Existing Content */}
       <ProfileSection
         profilePic={employee.profilePic}
         name={employee.name}
         designation={employee.designation}
-        postTime={employee.postTime}
+        postTime={employee.created_at}
         goToProfile={goToProfile}
       />
-      <ActivitySection postImage={employee.postImage} caption={employee.caption} />
-      <ReactionSection upvotes={employee.upvotes} shares={employee.shares} />
+      
+      <ActivitySection 
+        postImage={employee.postImage} 
+        caption={employee.caption} 
+      />
+      
+      <ReactionSection 
+        upvotes={employee.upvotes} 
+        shares={employee.shares} 
+      />
     </div>
   );
 };

@@ -7,16 +7,30 @@ import "./page4.css";
 const Page5 = ({ currentUser }) => {
   const navigate = useNavigate();
   const [employeePosts, setEmployeePosts] = useState([]);
-  const [employeeDetails, setEmployeeDetails] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     designation: "",
-    industry: "",
     bio: "",
+  });
+  const [postFormData, setPostFormData] = useState({
+    image: null,
+    caption: "",
+    previewUrl: ""
+  });
+
+  // Default user data structure matching your screenshot
+  const [employeeDetails, setEmployeeDetails] = useState({
+    name: "",
+    designation: "",
+    username: "",
+    bio: "",
+    followers: 0,
+    experts: 0
   });
 
   useEffect(() => {
@@ -25,50 +39,39 @@ const Page5 = ({ currentUser }) => {
         setLoading(true);
         setError(null);
         
-        const dummyData = {
-          user_id: "user_123",
-          name: currentUser || "Akhila",
+        if (!currentUser) {
+          throw new Error("No user logged in");
+        }
+
+        // Extract username from email (first part before @)
+        const username = currentUser.username || 
+                       (currentUser.attributes?.email ? 
+                        currentUser.attributes.email.split('@')[0] : 
+                        'user');
+
+        // Set profile data based on currentUser
+        const profileData = {
+          name: currentUser.attributes?.name || "Aneesha Antony",
           designation: "Software Developer",
-          profile_pic: "default-profile.jpg",
+          username: username.toLowerCase(),
           bio: "Passionate developer with 5 years of experience in React and Node.js",
-          username: currentUser ? currentUser.toLowerCase() : "akhila",
           followers: 128,
           experts: 15
         };
-        
-        setEmployeeDetails(dummyData);
+
+        setEmployeeDetails(profileData);
         setFormData({
-          name: dummyData.name,
-          designation: dummyData.designation,
-          industry: "Technology",
-          bio: dummyData.bio,
+          name: profileData.name,
+          designation: profileData.designation,
+          bio: profileData.bio,
         });
 
-        const dummyPosts = [
-          {
-            post_id: 1,
-            image_url: "default-post.jpg",
-            caption: "Working on a new project!",
-            created_at: new Date().toISOString(),
-            upvotes: 24,
-            comments: 5,
-            shares: 2
-          },
-          {
-            post_id: 2,
-            image_url: "default-post.jpg",
-            caption: "Just deployed our new feature",
-            created_at: new Date(Date.now() - 86400000).toISOString(),
-            upvotes: 42,
-            comments: 8,
-            shares: 3
-          }
-        ];
-        
-        setEmployeePosts(dummyPosts);
-        
+        // Load user posts from localStorage if available
+        const savedPosts = JSON.parse(localStorage.getItem('userPosts')) || [];
+        setEmployeePosts(savedPosts);
+
       } catch (err) {
-        setError("Failed to load profile data");
+        setError("Failed to load profile data. Please try again.");
         console.error(err);
       } finally {
         setLoading(false);
@@ -86,17 +89,72 @@ const Page5 = ({ currentUser }) => {
     });
   };
 
+  const handlePostInputChange = (e) => {
+    if (e.target.name === 'image') {
+      const file = e.target.files[0];
+      if (file) {
+        const previewUrl = URL.createObjectURL(file);
+        setPostFormData({
+          ...postFormData,
+          image: file,
+          previewUrl
+        });
+      }
+    } else {
+      const { name, value } = e.target;
+      setPostFormData({
+        ...postFormData,
+        [name]: value
+      });
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    setEmployeeDetails({
+    const updatedProfile = {
       ...employeeDetails,
-      ...formData,
-    });
+      ...formData
+    };
+    setEmployeeDetails(updatedProfile);
     setIsModalOpen(false);
+  };
+
+  const handlePostSubmit = (e) => {
+    e.preventDefault();
+    
+    const newPost = {
+      post_id: Date.now(),
+      image_url: postFormData.previewUrl || "default-post.jpg",
+      caption: postFormData.caption,
+      created_at: new Date().toISOString(),
+      upvotes: 0,
+      comments: 0,
+      shares: 0,
+      user_id: currentUser?.username || "user123",
+      name: employeeDetails.name,
+      profile_pic: "default-profile.jpg",
+      designation: employeeDetails.designation
+    };
+
+    const updatedPosts = [newPost, ...employeePosts];
+    setEmployeePosts(updatedPosts);
+    localStorage.setItem('userPosts', JSON.stringify(updatedPosts));
+    
+    setPostFormData({
+      image: null,
+      caption: "",
+      previewUrl: ""
+    });
+    setIsPostModalOpen(false);
   };
 
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen);
+  };
+
+  const openPostModal = () => {
+    setIsPostModalOpen(true);
+    setIsPopupOpen(false);
   };
 
   if (loading) {
@@ -107,10 +165,6 @@ const Page5 = ({ currentUser }) => {
     return <div className="error-container">{error}</div>;
   }
 
-  if (!employeeDetails) {
-    return <div className="not-found-container">Profile not found</div>;
-  }
-
   return (
     <div className="container">
       <div className="profile">
@@ -118,12 +172,9 @@ const Page5 = ({ currentUser }) => {
           <FaArrowLeft className="back" onClick={() => navigate(-1)} />
           <div className="profile-content">
             <img 
-              src={employeeDetails.profile_pic} 
+              src="default-profile.jpg" 
               alt="Profile" 
               className="image"
-              onError={(e) => {
-                e.target.src = "default-profile.jpg";
-              }}
             />
             <div className="details">
               <h2 className="name">{employeeDetails.name}</h2>
@@ -147,7 +198,7 @@ const Page5 = ({ currentUser }) => {
               <FaPlus className="icon popup" onClick={togglePopup} />
               {isPopupOpen && (
                 <div className="menu">
-                  <div className="item" onClick={() => navigate('/create-post')}>New Post</div>
+                  <div className="item" onClick={openPostModal}>New Post</div>
                   <div className="item" onClick={() => navigate('/create-issue')}>Create a New Issue</div>
                   <div className="item" onClick={() => navigate('/add-suggestion')}>Add a Suggestion</div>
                 </div>
@@ -162,18 +213,13 @@ const Page5 = ({ currentUser }) => {
           employeePosts.map((post) => (
             <EmployeePost 
               key={post.post_id} 
-              employee={{
-                ...post,
-                name: employeeDetails.name,
-                designation: employeeDetails.designation,
-                profile_pic: employeeDetails.profile_pic
-              }} 
+              employee={post} 
               goToProfile={() => {}} 
             />
           ))
         ) : (
           <div className="no-posts">
-            <p>No posts available</p>
+            <p>No posts available. Create your first post!</p>
           </div>
         )}
       </div>
@@ -204,26 +250,70 @@ const Page5 = ({ currentUser }) => {
                 />
               </label>
               <label>
-                Industry:
-                <input
-                  type="text"
-                  name="industry"
-                  value={formData.industry}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <label>
                 Bio:
                 <textarea
                   name="bio"
                   value={formData.bio}
                   onChange={handleInputChange}
-                  rows="4"
+                  rows="3"
+                  required
                 />
               </label>
               <div className="buttons">
                 <button type="submit">Save</button>
-                <button type="button" onClick={() => setIsModalOpen(false)}>
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isPostModalOpen && (
+        <div className="overlay">
+          <div className="modal post-modal">
+            <h2>Create New Post</h2>
+            <form onSubmit={handlePostSubmit}>
+              <div className="image-upload">
+                {postFormData.previewUrl ? (
+                  <img 
+                    src={postFormData.previewUrl} 
+                    alt="Preview" 
+                    className="image-preview"
+                  />
+                ) : (
+                  <div className="upload-placeholder">
+                    <p>Select an image to upload</p>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handlePostInputChange}
+                  required
+                />
+              </div>
+              <label>
+                Caption:
+                <textarea
+                  name="caption"
+                  value={postFormData.caption}
+                  onChange={handlePostInputChange}
+                  rows="3"
+                  required
+                />
+              </label>
+              <div className="buttons">
+                <button type="submit">Post</button>
+                <button 
+                  type="button" 
+                  onClick={() => setIsPostModalOpen(false)}
+                >
                   Cancel
                 </button>
               </div>

@@ -11,59 +11,120 @@ const Page1 = ({ isOpen }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const authFetch = async (url, options = {}, timeout = 8000) => {
+    const token = localStorage.getItem("authToken");
+    
+    if (!token) {
+      navigate("/login");
+      throw new Error("Authentication required");
+    }
+
+    const headers = {
+      ...options.headers,
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    };
+
+    try {
+      const response = await Promise.race([
+        fetch(url, { ...options, headers }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Request timeout')), timeout)
+        )
+      ]);
+
+      if (response.status === 401) {
+        localStorage.removeItem("authToken");
+        navigate("/login");
+        throw new Error("Authentication expired");
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Request failed with status ${response.status}`
+        );
+      }
+
+      return response;
+    } catch (error) {
+      console.error(`Request to ${url} failed:`, error);
+      throw error;
+    }
+  };
+
+  const constructImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    if (path.startsWith('/')) return `${API_BASE_URL}${path}`;
+    return `${API_BASE_URL}/${path}`;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const fetchWithTimeout = (url, options = {}, timeout = 8000) => {
-          return Promise.race([
-            fetch(url, options),
-            new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('Request timeout')), timeout)
-            )
-          ]);
-        };
+        // First get all posts
+        const postResponse = await authFetch(`${API_BASE_URL}/all-posts`);
+        const postData = await postResponse.json();
 
-        // Only fetch users and posts now
-        const [userResponse, postResponse] = await Promise.all([
-          fetchWithTimeout(`${API_BASE_URL}/all`).catch(e => { throw new Error(`Users: ${e.message}`) }),
-          fetchWithTimeout(`${API_BASE_URL}/all-posts`).catch(e => { throw new Error(`Posts: ${e.message}`) })
-        ]);
+        if (!postData.posts || !Array.isArray(postData.posts)) {
+          throw new Error("Invalid post data format");
+        }
 
-        if (!userResponse.ok) throw new Error(`User data failed: ${userResponse.status}`);
-        if (!postResponse.ok) throw new Error(`Post data failed: ${postResponse.status}`);
+        // Create combined posts with placeholder user data first
+        const initialCombined = postData.posts.map(post => ({
+          post_id: post.post_id,
+          user_id: post.user_id,
+          name: `Loading user...`, // Temporary placeholder
+          designation: "",
+          profilePic: "/default-profile.png",
+          postImage: constructImageUrl(post.image_url),
+          caption: post.caption || "",
+          created_at: post.created_at,
+          upvotes: post.upvotes || 0,
+          shares: post.shares || 0,
+          plant: post.plant || "unknown",
+          type: post.type || "suggestion"
+        }));
 
-        const [userData, postData] = await Promise.all([
-          userResponse.json(),
-          postResponse.json()
-        ]);
+        setCombinedPosts(initialCombined);
 
-        // Create a map of users for quick lookup
-        const userMap = new Map(userData.map(user => [user.user_id, user]));
+        // Now fetch user details for each post and update
+        const updatedPosts = await Promise.all(
+          postData.posts.map(async (post) => {
+            try {
+              const userResponse = await authFetch(
+                `${API_BASE_URL}/by_id?user_id=${post.user_id}`
+              );
+              const userData = await userResponse.json();
+              
+              return {
+                ...post,
+                name: userData.name || `User ${post.user_id}`,
+                designation: userData.designation || "",
+                profilePic: constructImageUrl(userData.profile_pic) || "/default-profile.png"
+              };
+            } catch (error) {
+              console.error(`Failed to fetch user ${post.user_id}:`, error);
+              return {
+                ...post,
+                name: `User ${post.user_id}`,
+                designation: "",
+                profilePic: "/default-profile.png"
+              };
+            }
+          })
+        );
 
-        // Combine posts with user data (without comments)
-        const combined = postData.posts?.map(post => {
-          const user = userMap.get(post.user_id) || {};
-          
-          return {
-            post_id: post.post_id,
-            user_id: post.user_id,
-            name: user.name || "Unknown",
-            designation: user.designation || "",
-            profile_pic: user.profile_pic || "",
-            image_url: post.image_url || "",
-            caption: post.caption || "",
-            created_at: post.created_at,
-            upvotes: user.upvotes || 0,
-            shares: user.shares || 0
-          };
-        }) || [];
-
-        setCombinedPosts(combined);
+        setCombinedPosts(updatedPosts);
       } catch (err) {
-        setError(err.message);
+        if (err.message.includes("Authentication")) {
+          return;
+        }
+        setError(err.message || "Failed to load posts");
         console.error("Fetch error:", err);
       } finally {
         setLoading(false);
@@ -71,7 +132,7 @@ const Page1 = ({ isOpen }) => {
     };
 
     fetchData();
-  }, []);
+  }, [navigate]);
 
   const goToProfile = (userId) => {
     navigate(`/profile/${userId}`);
@@ -97,14 +158,20 @@ const Page1 = ({ isOpen }) => {
 
   return (
     <div className="page1-container">
-      {combinedPosts.map((post) => (
-        <div key={post.post_id} className="post-container">
-          <EmployeePost
-            employee={post}
-            goToProfile={() => goToProfile(post.user_id)}
-          />
+      {combinedPosts.length > 0 ? (
+        combinedPosts.map((post) => (
+          <div key={post.post_id} className="post-container">
+            <EmployeePost
+              employee={post}
+              goToProfile={() => goToProfile(post.user_id)}
+            />
+          </div>
+        ))
+      ) : (
+        <div className="no-posts">
+          <p>No posts available</p>
         </div>
-      ))}
+      )}
     </div>
   );
 };
