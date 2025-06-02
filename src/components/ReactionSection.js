@@ -10,24 +10,35 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const authFetch = async (url, options = {}) => {
+    const token = localStorage.getItem("authToken");
+    const headers = {
+      ...options.headers,
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    };
+
+    try {
+      const response = await fetch(url, { ...options, headers });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.status}`);
+      }
+      return response;
+    } catch (err) {
+      console.error("API call failed:", err);
+      throw err;
+    }
+  };
+
   useEffect(() => {
     const fetchComments = async () => {
       try {
         setLoading(true);
         setError(null);
-        console.log("Fetching comments...");
-
-        const response = await fetch('http://172.16.10.13:8000/all-comments');
-        console.log("Response status:", response.status);
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch comments: ${response.status}');
-        }
-
-        const data = await response.json();
-        console.log("Fetched comments:", data);
         
-        // Transform the data to match the expected format
+        const response = await authFetch(`http://172.16.10.13:8000/all-comments?post_id=${postId}`);
+        const data = await response.json();
+        
         const transformedComments = data.map(comment => ({
           comment_id: comment.comment_id,
           user: comment.user_name,
@@ -38,74 +49,88 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
           post_id: comment.post_id
         }));
         
-        console.log("Transformed comments:", transformedComments);
         setCommentList(transformedComments);
       } catch (err) {
         console.error("Error fetching comments:", err);
         setError(err.message);
-        setCommentList([]);
       } finally {
         setLoading(false);
       }
     };
 
-    // Fetch comments immediately when component mounts
-    fetchComments();
-  }, []); // Remove showComments dependency to fetch on mount
-
-  const handleUpvote = () => {
-    if (isUpvoted) {
-      setUpvoteCount(upvoteCount - 1);
-    } else {
-      setUpvoteCount(upvoteCount + 1);
+    if (showComments) {
+      fetchComments();
     }
-    setIsUpvoted(!isUpvoted);
+  }, [showComments, postId]);
+
+  const handleUpvote = async () => {
+    try {
+      const newUpvoteStatus = !isUpvoted;
+      const response = await authFetch(`http://172.16.10.13:8000/upvote-post`, {
+        method: 'POST',
+        body: JSON.stringify({
+          post_id: postId,
+          upvote: newUpvoteStatus
+        })
+      });
+      
+      if (response.ok) {
+        setIsUpvoted(newUpvoteStatus);
+        setUpvoteCount(newUpvoteStatus ? upvoteCount + 1 : upvoteCount - 1);
+      }
+    } catch (err) {
+      console.error("Error updating upvote:", err);
+    }
   };
 
   const handleAddComment = async (commentText) => {
     try {
       setError(null);
       
-      const response = await fetch('http://172.16.10.13:8000/write-comments', {
+      const response = await authFetch('http://172.16.10.13:8000/write-comments', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           post_id: postId,
-          user_id: "current_user_id", // Replace with actual user ID from your auth system
           text: commentText
         })
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to add comment: ${response.status}');
+      if (response.ok) {
+        const newComment = await response.json();
+        setCommentList(prevComments => [{
+          comment_id: newComment.comment_id,
+          user: "You",
+          text: newComment.text,
+          time: new Date().toLocaleString(),
+          profile_pic: "",
+          replies: [],
+          post_id: postId
+        }, ...prevComments]);
       }
-
-      const newComment = await response.json();
-      setCommentList(prevComments => [newComment, ...prevComments]);
-      
     } catch (err) {
       setError(err.message);
     }
   };
 
   const handleDeleteComment = async (commentId) => {
-    setCommentList(prevComments => 
-      prevComments.filter(comment => comment.comment_id !== commentId)
-    );
+    try {
+      await authFetch(`http://172.16.10.13:8000/delete-comment/${commentId}`, {
+        method: 'DELETE'
+      });
+      setCommentList(prev => prev.filter(c => c.comment_id !== commentId));
+    } catch (err) {
+      console.error("Error deleting comment:", err);
+    }
   };
 
   return (
     <div className="reaction-container">
-      {/* Reaction Stats */}
       <div className="reaction-stats">
         <span className="reaction-count">{upvoteCount} 👍</span>
         <span className="reaction-count">{commentList.length} comments</span>
         <span className="reaction-count">{shares} shares</span>
       </div>
 
-      {/* Reaction Buttons */}
       <div className="reaction-buttons">
         <div 
           className={`reaction-item ${isUpvoted ? 'active' : ''}`} 
@@ -135,7 +160,6 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
         </div>
       </div>
 
-      {/* Comment Section */}
       {showComments && (
         <div className="comments-section">
           {loading ? (

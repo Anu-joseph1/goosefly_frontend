@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./page1.css";
 import EmployeePost from "../components/EmployeePost";
+import { jwtDecode } from "jwt-decode"; // Make sure to install this package
 
 const API_BASE_URL = "http://172.16.10.13:8000";
 
@@ -11,32 +12,54 @@ const Page1 = ({ isOpen }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Function to check if JWT token is expired
+  const isTokenExpired = (token) => {
+    try {
+      const decoded = jwtDecode(token);
+      return decoded.exp * 1000 < Date.now();
+    } catch (e) {
+      return true; // If token is invalid, consider it expired
+    }
+  };
+
   const authFetch = async (url, options = {}, timeout = 8000) => {
     const token = localStorage.getItem("authToken");
     
     if (!token) {
-      navigate("/login");
+      navigate("/"); // Redirect to home instead of non-existent login
       throw new Error("Authentication required");
+    }
+
+    // Check token expiration
+    if (isTokenExpired(token)) {
+      localStorage.removeItem("authToken");
+      navigate("/");
+      throw new Error("Session expired. Please login again.");
     }
 
     const headers = {
       ...options.headers,
       "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Accept": "application/json"
     };
 
-    try {
-      const response = await Promise.race([
-        fetch(url, { ...options, headers }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Request timeout')), timeout)
-        )
-      ]);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-      if (response.status === 401) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.status === 401 || response.status === 403) {
         localStorage.removeItem("authToken");
-        navigate("/login");
-        throw new Error("Authentication expired");
+        navigate("/");
+        throw new Error("Authentication failed. Please login again.");
       }
 
       if (!response.ok) {
@@ -48,6 +71,11 @@ const Page1 = ({ isOpen }) => {
 
       return response;
     } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        console.error(`Request to ${url} timed out`);
+        throw new Error('Request timed out');
+      }
       console.error(`Request to ${url} failed:`, error);
       throw error;
     }
@@ -66,7 +94,7 @@ const Page1 = ({ isOpen }) => {
         setLoading(true);
         setError(null);
 
-        // First get all posts
+        // Get all posts
         const postResponse = await authFetch(`${API_BASE_URL}/all-posts`);
         const postData = await postResponse.json();
 
@@ -78,7 +106,7 @@ const Page1 = ({ isOpen }) => {
         const initialCombined = postData.posts.map(post => ({
           post_id: post.post_id,
           user_id: post.user_id,
-          name: `Loading user...`, // Temporary placeholder
+          name: `Loading user...`,
           designation: "",
           profilePic: "/default-profile.png",
           postImage: constructImageUrl(post.image_url),
@@ -97,7 +125,7 @@ const Page1 = ({ isOpen }) => {
           postData.posts.map(async (post) => {
             try {
               const userResponse = await authFetch(
-                `${API_BASE_URL}/by_id?user_id=${post.user_id}`
+                `${API_BASE_URL}/users/${post.user_id}`
               );
               const userData = await userResponse.json();
               
@@ -152,6 +180,10 @@ const Page1 = ({ isOpen }) => {
       <div className="error-container">
         <p>Error: {error}</p>
         <button onClick={() => window.location.reload()}>Retry</button>
+        <button onClick={() => {
+          localStorage.removeItem("authToken");
+          navigate("/");
+        }}>Go to Home</button>
       </div>
     );
   }
