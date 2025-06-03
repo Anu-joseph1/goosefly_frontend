@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./page1.css";
 import EmployeePost from "../components/EmployeePost";
-import { jwtDecode } from "jwt-decode"; // Make sure to install this package
+import { jwtDecode } from "jwt-decode";
 
 const API_BASE_URL = "http://172.16.10.13:8000";
 
@@ -12,29 +12,24 @@ const Page1 = ({ isOpen }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Function to check if JWT token is expired
+  // Token expiration check
   const isTokenExpired = (token) => {
     try {
       const decoded = jwtDecode(token);
       return decoded.exp * 1000 < Date.now();
     } catch (e) {
-      return true; // If token is invalid, consider it expired
+      return true;
     }
   };
 
+  // Authenticated fetch wrapper
   const authFetch = async (url, options = {}, timeout = 8000) => {
     const token = localStorage.getItem("authToken");
     
-    if (!token) {
-      navigate("/"); // Redirect to home instead of non-existent login
-      throw new Error("Authentication required");
-    }
-
-    // Check token expiration
-    if (isTokenExpired(token)) {
+    if (!token || isTokenExpired(token)) {
       localStorage.removeItem("authToken");
       navigate("/");
-      throw new Error("Session expired. Please login again.");
+      throw new Error("Authentication required");
     }
 
     const headers = {
@@ -59,28 +54,21 @@ const Page1 = ({ isOpen }) => {
       if (response.status === 401 || response.status === 403) {
         localStorage.removeItem("authToken");
         navigate("/");
-        throw new Error("Authentication failed. Please login again.");
+        throw new Error("Authentication failed");
       }
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || `Request failed with status ${response.status}`
-        );
+        throw new Error(`Request failed with status ${response.status}`);
       }
 
       return response;
     } catch (error) {
       clearTimeout(timeoutId);
-      if (error.name === 'AbortError') {
-        console.error(`Request to ${url} timed out`);
-        throw new Error('Request timed out');
-      }
-      console.error(`Request to ${url} failed:`, error);
       throw error;
     }
   };
 
+  // Construct proper image URLs
   const constructImageUrl = (path) => {
     if (!path) return null;
     if (path.startsWith('http')) return path;
@@ -94,7 +82,7 @@ const Page1 = ({ isOpen }) => {
         setLoading(true);
         setError(null);
 
-        // Get all posts
+        // First endpoint: Get all posts
         const postResponse = await authFetch(`${API_BASE_URL}/all-posts`);
         const postData = await postResponse.json();
 
@@ -102,7 +90,7 @@ const Page1 = ({ isOpen }) => {
           throw new Error("Invalid post data format");
         }
 
-        // Create combined posts with placeholder user data first
+        // Create initial posts with placeholder user data
         const initialCombined = postData.posts.map(post => ({
           post_id: post.post_id,
           user_id: post.user_id,
@@ -120,12 +108,12 @@ const Page1 = ({ isOpen }) => {
 
         setCombinedPosts(initialCombined);
 
-        // Now fetch user details for each post and update
+        // Second endpoint: Get user details by ID for each post
         const updatedPosts = await Promise.all(
           postData.posts.map(async (post) => {
             try {
               const userResponse = await authFetch(
-                `${API_BASE_URL}/users/${post.user_id}`
+                `${API_BASE_URL}/by_id?user_id=${post.user_id}`
               );
               const userData = await userResponse.json();
               
@@ -149,9 +137,6 @@ const Page1 = ({ isOpen }) => {
 
         setCombinedPosts(updatedPosts);
       } catch (err) {
-        if (err.message.includes("Authentication")) {
-          return;
-        }
         setError(err.message || "Failed to load posts");
         console.error("Fetch error:", err);
       } finally {
@@ -170,7 +155,6 @@ const Page1 = ({ isOpen }) => {
     return (
       <div className="loading-container">
         <div className="spinner"></div>
-        <p>Loading posts...</p>
       </div>
     );
   }
@@ -178,18 +162,13 @@ const Page1 = ({ isOpen }) => {
   if (error) {
     return (
       <div className="error-container">
-        <p>Error: {error}</p>
-        <button onClick={() => window.location.reload()}>Retry</button>
-        <button onClick={() => {
-          localStorage.removeItem("authToken");
-          navigate("/");
-        }}>Go to Home</button>
+        <p>Error loading content</p>
       </div>
     );
   }
 
   return (
-    <div className="page1-container">
+    <div className={`page1-container ${isOpen ? '' : 'expanded'}`}>
       {combinedPosts.length > 0 ? (
         combinedPosts.map((post) => (
           <div key={post.post_id} className="post-container">
