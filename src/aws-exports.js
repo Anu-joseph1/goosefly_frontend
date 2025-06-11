@@ -7,7 +7,7 @@ const awsExports = {
   aws_cloud_logic_custom: [
     {
       name: "api",
-      endpoint: "https://your-api-gateway-id.execute-api.ap-south-1.amazonaws.com/prod", // Replace with actual
+      endpoint: "http://172.16.11.171:8000", // Update this to your actual endpoint
       region: "ap-south-1"
     }
   ],

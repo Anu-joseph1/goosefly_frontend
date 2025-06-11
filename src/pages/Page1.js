@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./page1.css";
 import EmployeePost from "../components/EmployeePost";
-import { jwtDecode } from "jwt-decode";
+import { fetchAuthSession } from "aws-amplify/auth";
+import { Amplify } from "aws-amplify";
+import awsconfig from "../aws-exports";
 
-const API_BASE_URL = "http://172.16.10.13:8000";
+// Configure Amplify
+Amplify.configure(awsconfig);
 
 const Page1 = ({ isOpen }) => {
   const navigate = useNavigate();
@@ -12,139 +15,120 @@ const Page1 = ({ isOpen }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Token expiration check
-  const isTokenExpired = (token) => {
+  // Function to get JWT token from Cognito
+  const getAuthToken = async () => {
     try {
-      const decoded = jwtDecode(token);
-      return decoded.exp * 1000 < Date.now();
-    } catch (e) {
-      return true;
+      const { tokens } = await fetchAuthSession();
+      if (!tokens?.idToken) {
+        throw new Error("No ID token found");
+      }
+      return tokens.idToken.toString();
+    } catch (err) {
+      console.error("Error getting token:", err);
+      throw new Error("Authentication required. Please sign in.");
     }
   };
 
-  // Authenticated fetch wrapper
-  const authFetch = async (url, options = {}, timeout = 8000) => {
-    const token = localStorage.getItem("authToken");
+  // Enhanced fetch function with retry logic
+  const fetchWithAuth = async (url, retries = 3) => {
+    const token = await getAuthToken();
     
-    if (!token || isTokenExpired(token)) {
-      localStorage.removeItem("authToken");
-      navigate("/");
-      throw new Error("Authentication required");
-    }
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
-    const headers = {
-      ...options.headers,
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "Accept": "application/json"
-    };
+        if (response.status === 401) {
+          // Token might be expired, try refreshing
+          if (i === 0) {
+            try {
+              await fetchAuthSession({ forceRefresh: true });
+              continue;
+            } catch (refreshError) {
+              console.error("Token refresh failed:", refreshError);
+              throw new Error("Session expired. Please login again.");
+            }
+          }
+          throw new Error("Unauthorized access");
+        }
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem("authToken");
-        navigate("/");
-        throw new Error("Authentication failed");
+        return await response.json();
+      } catch (err) {
+        if (i === retries - 1) throw err;
+        // Wait for 1 second before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
-
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      throw error;
     }
-  };
-
-  // Construct proper image URLs
-  const constructImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-    if (path.startsWith('/')) return `${API_BASE_URL}${path}`;
-    return `${API_BASE_URL}/${path}`;
   };
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchData = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        // Fetch data from both endpoints with authentication
+        const [userData, postData] = await Promise.all([
+          fetchWithAuth("http://172.16.11.171:8000/all"),
+          fetchWithAuth("http://172.16.11.171:8000/all-posts"),
+        ]);
 
-        // First endpoint: Get all posts
-        const postResponse = await authFetch(`${API_BASE_URL}/all-posts`);
-        const postData = await postResponse.json();
+        if (!isMounted) return;
 
-        if (!postData.posts || !Array.isArray(postData.posts)) {
-          throw new Error("Invalid post data format");
-        }
-
-        // Create initial posts with placeholder user data
-        const initialCombined = postData.posts.map(post => ({
-          post_id: post.post_id,
-          user_id: post.user_id,
-          name: `Loading user...`,
-          designation: "",
-          profilePic: "/default-profile.png",
-          postImage: constructImageUrl(post.image_url),
-          caption: post.caption || "",
-          created_at: post.created_at,
-          upvotes: post.upvotes || 0,
-          shares: post.shares || 0,
-          plant: post.plant || "unknown",
-          type: post.type || "suggestion"
-        }));
-
-        setCombinedPosts(initialCombined);
-
-        // Second endpoint: Get user details by ID for each post
-        const updatedPosts = await Promise.all(
-          postData.posts.map(async (post) => {
-            try {
-              const userResponse = await authFetch(
-                `${API_BASE_URL}/by_id?user_id=${post.user_id}`
-              );
-              const userData = await userResponse.json();
-              
-              return {
-                ...post,
-                name: userData.name || `User ${post.user_id}`,
-                designation: userData.designation || "",
-                profilePic: constructImageUrl(userData.profile_pic) || "/default-profile.png"
-              };
-            } catch (error) {
-              console.error(`Failed to fetch user ${post.user_id}:`, error);
-              return {
-                ...post,
-                name: `User ${post.user_id}`,
-                designation: "",
-                profilePic: "/default-profile.png"
-              };
-            }
-          })
+        // Create a map of users for quick lookup
+        const userMap = new Map(
+          userData.map((user) => [user.user_id, user])
         );
 
-        setCombinedPosts(updatedPosts);
+        // Combine posts with user data
+        const combined = postData.posts.map((post) => {
+          const user = userMap.get(post.user_id) || {};
+          return {
+            post_id: post.post_id,
+            user_id: post.user_id,
+            name: user.name || "Unknown User",
+            designation: user.designation || "",
+            profile_pic: user.profile_pic || "default-profile.jpg",
+            image_url: post.image_url,
+            caption: post.caption || "",
+            created_at: post.created_at,
+            upvotes: post.upvotes || 0,
+            comments: post.comments || 0,
+            shares: post.shares || 0,
+          };
+        });
+
+        setCombinedPosts(combined);
       } catch (err) {
-        setError(err.message || "Failed to load posts");
-        console.error("Fetch error:", err);
+        if (!isMounted) return;
+        
+        setError(err.message);
+        if (
+          err.message.includes("Authentication") ||
+          err.message.includes("Unauthorized") ||
+          err.message.includes("Session expired")
+        ) {
+          navigate("/login", { state: { from: window.location.pathname } });
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [navigate]);
 
   const goToProfile = (userId) => {
@@ -154,7 +138,8 @@ const Page1 = ({ isOpen }) => {
   if (loading) {
     return (
       <div className="loading-container">
-        <div className="spinner"></div>
+        <div className="loading-spinner"></div>
+        <p>Loading posts...</p>
       </div>
     );
   }
@@ -162,22 +147,28 @@ const Page1 = ({ isOpen }) => {
   if (error) {
     return (
       <div className="error-container">
-        <p>Error loading content</p>
+        <h3>Error Loading Content</h3>
+        <p>{error}</p>
+        <div className="error-actions">
+          <button onClick={() => window.location.reload()}>Retry</button>
+          <button onClick={() => navigate("/login")}>Login</button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={`page1-container ${isOpen ? '' : 'expanded'}`}>
+    <div className={`page1-container ${isOpen ? "shifted" : ""}`}>
       {combinedPosts.length > 0 ? (
-        combinedPosts.map((post) => (
-          <div key={post.post_id} className="post-container">
+        combinedPosts
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+          .map((post) => (
             <EmployeePost
+              key={post.post_id}
               employee={post}
               goToProfile={() => goToProfile(post.user_id)}
             />
-          </div>
-        ))
+          ))
       ) : (
         <div className="no-posts">
           <p>No posts available</p>

@@ -19,7 +19,7 @@ const ChatPage = () => {
       setLoading(false);
     } else {
       // Fallback: Fetch recipient data if not passed in state
-      fetch(`http://172.16.10.13:8000/by_id?user_id=${employeeId}`)
+      fetch(`http://172.16.11.171:8000/by_id?user_id=${employeeId}`)
         .then(response => response.json())
         .then(data => {
           setRecipient(data);

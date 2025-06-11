@@ -36,7 +36,7 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
         setLoading(true);
         setError(null);
         
-        const response = await authFetch(`http://172.16.10.13:8000/all-comments?post_id=${postId}`);
+        const response = await authFetch(`http://172.16.11.171:8000/all-comments?post_id=${postId}`);
         const data = await response.json();
         
         const transformedComments = data.map(comment => ({
@@ -66,7 +66,7 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
   const handleUpvote = async () => {
     try {
       const newUpvoteStatus = !isUpvoted;
-      const response = await authFetch(`http://172.16.10.13:8000/upvote-post`, {
+      const response = await authFetch(`http://172.16.11.171:8000/upvote-post`, {
         method: 'POST',
         body: JSON.stringify({
           post_id: postId,
@@ -87,7 +87,7 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
     try {
       setError(null);
       
-      const response = await authFetch('http://172.16.10.13:8000/write-comments', {
+      const response = await authFetch('http://172.16.11.171:8000/write-comments', {
         method: 'POST',
         body: JSON.stringify({
           post_id: postId,
@@ -114,7 +114,7 @@ const ReactionSection = ({ upvotes, comments: initialCommentCount, shares, postI
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await authFetch(`http://172.16.10.13:8000/delete-comment/${commentId}`, {
+      await authFetch(`http://172.16.11.171:8000/delete-comment/${commentId}`, {
         method: 'DELETE'
       });
       setCommentList(prev => prev.filter(c => c.comment_id !== commentId));
