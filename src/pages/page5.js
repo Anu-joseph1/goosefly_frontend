@@ -138,7 +138,7 @@ const Page5 = ({ currentUser }) => {
 
     const updatedPosts = [newPost, ...employeePosts];
     setEmployeePosts(updatedPosts);
-    localStorage.setItem('userPosts', JSON.stringify(updatedPosts));
+    localStorage.setItem('userPosts', JSON.stringify(updatedPosts)); // saving post locally
     
     setPostFormData({
       image: null,
